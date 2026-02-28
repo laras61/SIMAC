@@ -6,11 +6,15 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\RemainderController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentication Routes
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
 Route::post('/barang/insert', [BarangController::class, 'insert'])->name('barang.insert');
