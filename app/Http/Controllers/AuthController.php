@@ -32,10 +32,20 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
+            if (! $request->expectsJson()) {
+                return redirect()->intended(route('dashboard'));
+            }
+
             return response()->json([
                 'message' => 'Login berhasil',
                 'user' => $user,
             ], 200);
+        }
+
+        if (! $request->expectsJson()) {
+            return back()->withErrors([
+                'login_id' => 'Login gagal. Periksa kembali email/nama dan password Anda.',
+            ])->onlyInput('login_id');
         }
 
         return response()->json([
@@ -51,6 +61,10 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if (! $request->expectsJson()) {
+            return redirect()->route('login');
+        }
 
         return response()->json(['message' => 'Logout berhasil'], 200);
     }

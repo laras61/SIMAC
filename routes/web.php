@@ -7,14 +7,25 @@ use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\RemainderController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
 // Authentication Routes
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/login', function () {
+    return view('auth.login');
+})->middleware('guest')->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 
 
@@ -47,3 +58,4 @@ Route::post('/remainder/insert', [RemainderController::class, 'insert'])->name('
 Route::get('/remainder/{remainder}', [RemainderController::class, 'show'])->name('remainder.show');
 Route::match(['put', 'patch'], '/remainder/update/{remainder}', [RemainderController::class, 'update'])->name('remainder.update');
 Route::delete('/remainder/delete/{remainder}', [RemainderController::class, 'destroy'])->name('remainder.destroy');
+
