@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller; // Memastikan Controller di-import
 use App\Models\Barang;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class BarangController extends Controller
 {
@@ -14,7 +14,13 @@ class BarangController extends Controller
     public function index()
     {
         $items = Barang::query()->latest('id_ac')->get();
-        return view('barang.index', compact('items'));
+        $editItem = null;
+
+        if (request()->filled('edit')) {
+            $editItem = Barang::find(request('edit'));
+        }
+
+        return view('barang.index', compact('items', 'editItem'));
     }
 
     /**
@@ -22,8 +28,7 @@ class BarangController extends Controller
      */
     public function insert(Request $request)
     {
-        // Validasi input dari user
-        $request->validate([
+        $validated = $request->validate([
             'kode_bmn' => 'required|string|unique:tbl_barang,kode_bmn',
             'merk' => 'required|string',
             'serial_number' => 'required|string|unique:tbl_barang,serial_number',
@@ -34,8 +39,11 @@ class BarangController extends Controller
             'status' => 'required|in:aktif,rusak,nonaktif',
         ]);
 
-        // Menyimpan data baru ke database menggunakan Model
-        return Barang::create($request->all());
+        Barang::create($validated);
+
+        return redirect()
+            ->route('barang.index')
+            ->with('success', 'Data barang berhasil ditambahkan.');
     }
 
     /**
@@ -43,7 +51,6 @@ class BarangController extends Controller
      */
     public function show(Barang $barang)
     {
-        // Mengembalikan data detail barang
         return $barang;
     }
 
@@ -52,8 +59,7 @@ class BarangController extends Controller
      */
     public function update(Request $request, Barang $barang)
     {
-        // Validasi input update (perhatikan unique rule untuk kode_bmn dan serial_number agar mengecualikan data saat ini)
-        $request->validate([
+        $validated = $request->validate([
             'kode_bmn' => 'required|string|unique:tbl_barang,kode_bmn,' . $barang->id_ac . ',id_ac',
             'merk' => 'required|string',
             'serial_number' => 'required|string|unique:tbl_barang,serial_number,' . $barang->id_ac . ',id_ac',
@@ -64,11 +70,11 @@ class BarangController extends Controller
             'status' => 'required|in:aktif,rusak,nonaktif',
         ]);
 
-        // Update data di database
-        $barang->update($request->all());
+        $barang->update($validated);
 
-        // Mengembalikan data barang yang sudah diupdate
-        return $barang;
+        return redirect()
+            ->route('barang.index')
+            ->with('success', 'Data barang berhasil diupdate.');
     }
 
     /**
@@ -76,10 +82,15 @@ class BarangController extends Controller
      */
     public function destroy(Barang $barang)
     {
-        // Menghapus data dari database
-        $barang->delete();
-
-        // Mengembalikan response sukses
-        return response()->json(['message' => 'Barang berhasil dihapus.']);
+        try {
+            $barang->delete();
+            return redirect()
+                ->route('barang.index')
+                ->with('success', 'Data barang berhasil dihapus.');
+        } catch (QueryException $e) {
+            return redirect()
+                ->route('barang.index')
+                ->with('error', 'Data barang tidak bisa dihapus karena masih dipakai di data lain.');
+        }
     }
 }
