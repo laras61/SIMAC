@@ -10,6 +10,14 @@ use App\Http\Controllers\Controller;
 class AuthController extends Controller
 {
     /**
+     * Show the application's login form.
+     */
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    /**
      * Handle an authentication attempt.
      */
     public function login(Request $request)

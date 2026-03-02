@@ -13,7 +13,8 @@ Route::get('/', function () {
 });
 
 // Authentication Routes
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
