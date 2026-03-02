@@ -13,8 +13,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data user
-        return User::all();
+        $items = User::query()->latest('id_user')->get();
+        return view('user.index', compact('items'));
     }
 
     /**

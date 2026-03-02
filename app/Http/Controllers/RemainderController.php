@@ -13,8 +13,8 @@ class RemainderController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data remainder dengan relasi barang
-        return Remainder::with('barang')->get();
+        $items = Remainder::with('barang')->latest('id_remainder')->get();
+        return view('remainder.index', compact('items'));
     }
 
     /**

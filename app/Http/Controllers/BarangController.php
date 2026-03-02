@@ -13,8 +13,8 @@ class BarangController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data barang dari database
-        return Barang::all();
+        $items = Barang::query()->latest('id_ac')->get();
+        return view('barang.index', compact('items'));
     }
 
     /**

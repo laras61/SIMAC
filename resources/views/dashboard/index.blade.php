@@ -4,26 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard SIMAC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f8fafc;
-            --surface: #fff;
-            --text: #0f172a;
-            --muted: #64748b;
-            --line: #e2e8f0;
-            --ok: #0f766e;
+            --bg: #fff7ed;
+            --surface: #ffffff;
+            --text: #431407;
+            --muted: #9a3412;
+            --line: #fed7aa;
+            --primary: #ea580c;
+            --primary-dark: #c2410c;
+            --amber: #d97706;
+            --ok: #166534;
             --warn: #b45309;
             --danger: #b91c1c;
-            --blue-soft: #eff6ff;
-            --teal-soft: #ecfeff;
+            --orange-soft: #fff7ed;
             --amber-soft: #fffbeb;
-            --rose-soft: #fff1f2;
+            --cream-soft: #ffedd5;
         }
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: var(--bg);
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top right, #ffedd5 0%, var(--bg) 45%, #ffffff 100%);
             color: var(--text);
         }
         .wrap {
@@ -48,15 +51,16 @@
         .card {
             background: var(--surface);
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 12px;
+            box-shadow: 0 10px 24px rgba(194, 65, 12, 0.08);
         }
-        .stats .card:nth-child(1) { background: linear-gradient(180deg, var(--blue-soft), #fff); }
-        .stats .card:nth-child(2) { background: linear-gradient(180deg, var(--rose-soft), #fff); }
-        .stats .card:nth-child(3) { background: linear-gradient(180deg, var(--amber-soft), #fff); }
-        .stats .card:nth-child(4) { background: linear-gradient(180deg, var(--teal-soft), #fff); }
+        .stats .card:nth-child(1) { background: linear-gradient(180deg, #ffedd5, #ffffff); }
+        .stats .card:nth-child(2) { background: linear-gradient(180deg, #fee2e2, #ffffff); }
+        .stats .card:nth-child(3) { background: linear-gradient(180deg, #fef3c7, #ffffff); }
+        .stats .card:nth-child(4) { background: linear-gradient(180deg, #fffbeb, #ffffff); }
         .card .label { color: var(--muted); font-size: 12px; }
-        .card .value { margin-top: 6px; font-size: 22px; font-weight: 700; }
+        .card .value { margin-top: 6px; font-size: 22px; font-weight: 700; color: var(--primary-dark); }
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -69,18 +73,23 @@
             color: inherit;
             background: var(--surface);
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 12px;
-            border-top: 3px solid #cbd5e1;
+            border-top: 3px solid var(--primary);
+            box-shadow: 0 10px 24px rgba(194, 65, 12, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
         .menu-item:hover {
-            border-color: #cbd5e1;
-            background: #fcfdff;
+            border-color: #fdba74;
+            background: #fffaf5;
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(194, 65, 12, 0.12);
         }
         .menu-title {
             font-size: 14px;
             font-weight: 700;
             margin: 0 0 4px;
+            color: var(--primary-dark);
         }
         .menu-desc {
             margin: 0;
@@ -91,14 +100,14 @@
         .panel {
             background: var(--surface);
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 12px;
             margin-bottom: 10px;
             overflow-x: auto;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
-            border-top: 3px solid #bfdbfe;
+            box-shadow: 0 12px 26px rgba(194, 65, 12, 0.08);
+            border-top: 3px solid #fb923c;
         }
-        .panel h2 { margin: 0 0 10px; font-size: 16px; }
+        .panel h2 { margin: 0 0 10px; font-size: 16px; color: var(--primary-dark); }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -107,10 +116,10 @@
         th, td {
             text-align: left;
             padding: 8px 6px;
-            border-bottom: 1px solid #edf2f7;
+            border-bottom: 1px solid #ffedd5;
             white-space: nowrap;
         }
-        th { color: var(--muted); font-weight: 600; background: #f8fbff; }
+        th { color: var(--muted); font-weight: 600; background: #fff7ed; }
         .badge {
             display: inline-block;
             border-radius: 999px;
@@ -118,13 +127,13 @@
             font-size: 11px;
             font-weight: 600;
         }
-        .ok { color: var(--ok); background: #ecfeff; }
-        .warn { color: var(--warn); background: #fff7ed; }
-        .danger { color: var(--danger); background: #fef2f2; }
+        .ok { color: var(--ok); background: #dcfce7; }
+        .warn { color: #92400e; background: #fef3c7; }
+        .danger { color: var(--danger); background: #fee2e2; }
 
-        .panel:nth-of-type(1) { border-top-color: #93c5fd; }
-        .panel:nth-of-type(2) { border-top-color: #6ee7b7; }
-        .panel:nth-of-type(3) { border-top-color: #fcd34d; }
+        .panel:nth-of-type(1) { border-top-color: #f97316; }
+        .panel:nth-of-type(2) { border-top-color: #fb923c; }
+        .panel:nth-of-type(3) { border-top-color: #f59e0b; }
     </style>
 </head>
 <body>
@@ -139,17 +148,8 @@
         <div class="top">
             <div>
                 <h1>Dashboard SIMAC</h1>
-                <p class="sub">Informasi inti operasional AC + akses menu admin</p>
+                <p class="sub">Informasi operasional AC</p>
             </div>
-        </div>
-
-        <div class="menu-grid">
-            @foreach ($adminMenus as $menu)
-                <a class="menu-item" href="{{ route($menu['route']) }}">
-                    <p class="menu-title">{{ $menu['name'] }}</p>
-                    <p class="menu-desc">{{ $menu['desc'] }}</p>
-                </a>
-            @endforeach
         </div>
 
         <div class="stats">
@@ -208,8 +208,7 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Aset</th>
-                        <th>Ganti Freon</th>
-                        <th>Part Diganti</th>
+                        <th>Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -217,8 +216,21 @@
                         <tr>
                             <td>{{ $row['tanggal'] }}</td>
                             <td>{{ $row['aset'] }}</td>
-                            <td>{{ $row['freon'] }}</td>
-                            <td>{{ $row['part'] }}</td>
+                            <td>
+                                @php
+                                    $keteranganParts = [];
+                                    if (!empty($row['part'])) {
+                                        $keteranganParts[] = 'Part: ' . $row['part'];
+                                    }
+                                    if (!empty($row['freon'])) {
+                                        $keteranganParts[] = 'Freon: ' . $row['freon'];
+                                    }
+                                    if (!empty($row['keterangan'])) {
+                                        $keteranganParts[] = $row['keterangan'];
+                                    }
+                                @endphp
+                                {{ count($keteranganParts) ? implode(' | ', $keteranganParts) : '-' }}
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -228,3 +240,4 @@
     </div>
 </body>
 </html>
+

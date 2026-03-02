@@ -114,11 +114,11 @@
 
         <div class="app-menu" id="appMenu">
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
-            <a href="{{ route('barang.index') }}">Barang</a>
-            <a href="{{ route('user.index') }}">User</a>
-            <a href="{{ route('maintenance.index') }}">Maintenance</a>
-            <a href="{{ route('perbaikan.index') }}">Perbaikan</a>
-            <a href="{{ route('remainder.index') }}">Reminder</a>
+            <a href="{{ route('barang.index') }}" class="{{ request()->routeIs('barang.*') ? 'active' : '' }}">Barang</a>
+            <a href="{{ route('user.index') }}" class="{{ request()->routeIs('user.*') ? 'active' : '' }}">User</a>
+            <a href="{{ route('maintenance.index') }}" class="{{ request()->routeIs('maintenance.*') ? 'active' : '' }}">Maintenance</a>
+            <a href="{{ route('perbaikan.index') }}" class="{{ request()->routeIs('perbaikan.*') ? 'active' : '' }}">Perbaikan</a>
+            <a href="{{ route('remainder.index') }}" class="{{ request()->routeIs('remainder.*') ? 'active' : '' }}">Reminder</a>
 
             @auth
                 <form method="POST" action="{{ route('logout') }}">

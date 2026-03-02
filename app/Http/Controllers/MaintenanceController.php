@@ -13,8 +13,8 @@ class MaintenanceController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data maintenance dengan relasi barang dan user
-        return Maintenance::with(['barang', 'user'])->get();
+        $items = Maintenance::with(['barang', 'user'])->latest('id_maintenance')->get();
+        return view('maintenance.index', compact('items'));
     }
 
     /**

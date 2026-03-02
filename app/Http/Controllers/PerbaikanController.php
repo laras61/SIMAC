@@ -13,8 +13,8 @@ class PerbaikanController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data perbaikan dengan relasi barang dan user
-        return Perbaikan::with(['barang', 'user'])->get();
+        $items = Perbaikan::with(['barang', 'user'])->latest('id_perbaikan')->get();
+        return view('perbaikan.index', compact('items'));
     }
 
     /**
