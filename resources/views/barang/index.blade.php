@@ -30,9 +30,6 @@
         .panel { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 12px; padding: 14px; box-shadow: 0 12px 26px rgba(194,65,12,.08); overflow-x: auto; }
         h1 { margin: 0 0 4px; font-size: 24px; color: var(--primary-dark); }
         .sub { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
-        .alert { padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 10px; }
-        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
         .form-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 10px; }
         .field { display: grid; gap: 4px; min-width: 0; }
         .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
@@ -134,20 +131,6 @@
     <div class="wrap">
         <div class="stack">
             <div class="page-head">
-
-                @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert alert-error">{{ session('error') }}</div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert alert-error">
-                        {{ $errors->first() }}
-                    </div>
-                @endif
 
                 @if ($editItem)
                     <form method="POST" action="{{ route('barang.update', $editItem->id_ac) }}">
@@ -255,7 +238,7 @@
                                 <td>
                                     <div class="row-actions">
                                         <a href="{{ route('barang.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_ac])) }}" class="btn btn-warning">Edit</a>
-                                        <form method="POST" action="{{ route('barang.destroy', $row->id_ac) }}" onsubmit="return confirm('Hapus data ini?')">
+                                        <form method="POST" action="{{ route('barang.destroy', $row->id_ac) }}" class="delete-form" data-item="{{ $row->kode_bmn }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">Hapus</button>
@@ -330,7 +313,41 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        const swalBaseConfig = {
+            confirmButtonColor: '#ea580c'
+        };
+
+        @if (session('success'))
+            Swal.fire({
+                ...swalBaseConfig,
+                icon: 'success',
+                title: 'Berhasil',
+                text: @json(session('success')),
+                timer: 2200,
+                showConfirmButton: false
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                ...swalBaseConfig,
+                icon: 'error',
+                title: 'Gagal',
+                text: @json(session('error'))
+            });
+        @endif
+
+        @if ($errors->any())
+            Swal.fire({
+                ...swalBaseConfig,
+                icon: 'warning',
+                title: 'Validasi',
+                text: @json($errors->first())
+            });
+        @endif
+
         function openTambahModal() {
             document.getElementById('tambahBarangModal').classList.add('open');
         }
@@ -361,6 +378,34 @@
                     form.submit();
                 });
             }
+        })();
+
+        (function initDeleteConfirmation() {
+            const forms = document.querySelectorAll('.delete-form');
+            if (!forms.length) return;
+
+            forms.forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const itemCode = form.dataset.item || 'data ini';
+
+                    Swal.fire({
+                        ...swalBaseConfig,
+                        icon: 'warning',
+                        title: 'Hapus Barang?',
+                        text: `Data ${itemCode} akan dihapus permanen.`,
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, hapus',
+                        cancelButtonText: 'Batal',
+                        cancelButtonColor: '#9a3412'
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
         })();
     </script>
 </body>
