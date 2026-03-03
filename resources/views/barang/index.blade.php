@@ -128,6 +128,9 @@
 </head>
 <body>
     @include('partials.nav')
+    @php
+        $lokasiOptions = ['LAB A', 'LAB B', 'LAB C', 'LAB D', 'LAB E', 'LAB F', 'RUANG SEKRE', 'RUANG DOSEN'];
+    @endphp
     <div class="wrap">
         <div class="stack">
             <div class="page-head">
@@ -164,7 +167,14 @@
                             </div>
                             <div class="field">
                                 <label for="lokasi">Lokasi</label>
-                                <input id="lokasi" type="text" name="lokasi" value="{{ old('lokasi', $editItem->lokasi) }}" required>
+                                @php
+                                    $selectedLokasiEdit = old('lokasi', $editItem->lokasi);
+                                @endphp
+                                <select id="lokasi" name="lokasi" required>
+                                    @foreach ($lokasiOptions as $lokasiOption)
+                                        <option value="{{ $lokasiOption }}" {{ $selectedLokasiEdit === $lokasiOption ? 'selected' : '' }}>{{ $lokasiOption }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="field">
                                 <label for="status">Status</label>
@@ -291,7 +301,14 @@
                     </div>
                     <div class="field">
                         <label for="add_lokasi">Lokasi</label>
-                        <input id="add_lokasi" type="text" name="lokasi" value="{{ old('lokasi') }}" required>
+                        @php
+                            $selectedLokasiTambah = old('lokasi', $lokasiOptions[0]);
+                        @endphp
+                        <select id="add_lokasi" name="lokasi" required>
+                            @foreach ($lokasiOptions as $lokasiOption)
+                                <option value="{{ $lokasiOption }}" {{ $selectedLokasiTambah === $lokasiOption ? 'selected' : '' }}>{{ $lokasiOption }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="field">
                         <label for="add_status">Status</label>
