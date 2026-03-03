@@ -41,7 +41,10 @@ class AuthController extends Controller
             $user = Auth::user();
 
             if (! $request->expectsJson()) {
-                return redirect()->intended(route('dashboard'));
+                $redirectRoute = $user->role === 'admin'
+                    ? route('dashboard')
+                    : route('teknisi.dashboard');
+                return redirect()->intended($redirectRoute);
             }
 
             return response()->json([

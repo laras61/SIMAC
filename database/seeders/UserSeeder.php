@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@simac.com',
             'password' => Hash::make('password123'),
             'no_hp' => '081234567890',
+            'role' => 'admin',
         ]);
 
         // User Teknisi
@@ -28,14 +29,16 @@ class UserSeeder extends Seeder
             'email' => 'budi@simac.com',
             'password' => Hash::make('teknisi123'),
             'no_hp' => '089876543210',
+            'role' => 'teknisi',
         ]);
 
         // User Staff
         User::create([
-            'nama' => 'Siti Staff',
+            'nama' => 'Siti Teknisi',
             'email' => 'siti@simac.com',
-            'password' => Hash::make('staff123'),
+            'password' => Hash::make('teknisi123'),
             'no_hp' => '085678901234',
+            'role' => 'teknisi',
         ]);
     }
 }

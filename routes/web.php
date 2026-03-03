@@ -6,14 +6,18 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\RemainderController;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return Auth::check()
-        ? redirect()->route('dashboard')
-        : redirect()->route('login');
+    if (Auth::check()) {
+        return Auth::user()->role === 'admin'
+            ? redirect()->route('dashboard')
+            : redirect()->route('teknisi.dashboard');
+    }
+    return redirect()->route('login');
 });
 
 // Authentication Routes
@@ -24,6 +28,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
+
+Route::get('/teknisi-dashboard', [DashboardController::class, 'teknisi'])
+    ->middleware('auth')
+    ->name('teknisi.dashboard');
 Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
 Route::post('/barang/insert', [BarangController::class, 'insert'])->name('barang.insert');
 Route::get('/barang/{barang}', [BarangController::class, 'show'])->name('barang.show');
@@ -54,3 +62,8 @@ Route::get('/remainder/{remainder}', [RemainderController::class, 'show'])->name
 Route::match(['put', 'patch'], '/remainder/update/{remainder}', [RemainderController::class, 'update'])->name('remainder.update');
 Route::delete('/remainder/delete/{remainder}', [RemainderController::class, 'destroy'])->name('remainder.destroy');
 
+Route::get('/vendor', [VendorController::class, 'index'])->name('vendor.index');
+Route::post('/vendor/insert', [VendorController::class, 'insert'])->name('vendor.insert');
+Route::get('/vendor/{vendor}', [VendorController::class, 'show'])->name('vendor.show');
+Route::match(['put', 'patch'], '/vendor/update/{vendor}', [VendorController::class, 'update'])->name('vendor.update');
+Route::delete('/vendor/delete/{vendor}', [VendorController::class, 'destroy'])->name('vendor.destroy');

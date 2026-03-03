@@ -22,7 +22,7 @@ class BarangSeeder extends Seeder
             'tipe_ac' => 'Split Wall 1PK',
             'tgl_beli' => '2023-01-15',
             'tgl_instalasi' => '2023-01-20',
-            'lokasi' => 'Ruang Server',
+            'lokasi' => 'LAB A',
             'status' => 'aktif',
         ]);
 
@@ -34,7 +34,7 @@ class BarangSeeder extends Seeder
             'tipe_ac' => 'Cassette 2PK',
             'tgl_beli' => '2022-06-10',
             'tgl_instalasi' => '2022-06-15',
-            'lokasi' => 'Lobby Utama',
+            'lokasi' => 'LAB B',
             'status' => 'aktif',
         ]);
 
@@ -46,7 +46,7 @@ class BarangSeeder extends Seeder
             'tipe_ac' => 'Standing Floor 5PK',
             'tgl_beli' => '2021-11-05',
             'tgl_instalasi' => '2021-11-10',
-            'lokasi' => 'Aula Pertemuan',
+            'lokasi' => 'RUANG DOSEN',
             'status' => 'rusak',
         ]);
     }

@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index()
     {
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('teknisi.dashboard');
+        }
+
         $adminMenus = [
             ['name' => 'Barang', 'route' => 'barang.index', 'desc' => 'Data master aset AC'],
             ['name' => 'User', 'route' => 'user.index', 'desc' => 'Kelola akun pengguna'],
@@ -52,6 +57,7 @@ class DashboardController extends Controller
                 'part' => 'Valve service + pipa sambungan',
                 'teknisi' => 'Budi Teknisi',
                 'pic' => 'Andi (GA)',
+                'status' => 'Selesai',
             ],
             [
                 'tanggal' => '2026-01-09',
@@ -61,6 +67,7 @@ class DashboardController extends Controller
                 'part' => 'Fan motor',
                 'teknisi' => 'Raka AC Team',
                 'pic' => 'Andi (GA)',
+                'status' => 'Selesai',
             ],
         ];
 
@@ -85,5 +92,14 @@ class DashboardController extends Controller
             'repairHistories' => $repairHistories,
             'emailReminders' => $emailReminders,
         ]);
+    }
+
+    public function teknisi()
+    {
+        if (Auth::user()->role !== 'teknisi') {
+            return redirect()->route('dashboard');
+        }
+        
+        return view('teknisi_dashboard');
     }
 }
