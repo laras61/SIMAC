@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Perbaikan;
+use App\Models\Barang;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -14,7 +16,10 @@ class PerbaikanController extends Controller
     public function index()
     {
         $items = Perbaikan::with(['barang', 'user'])->latest('id_perbaikan')->get();
-        return view('perbaikan.index', compact('items'));
+        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
+        $listTeknisi = User::where('role', 'teknisi')->select('id_user', 'nama')->get();
+
+        return view('perbaikan.index', compact('items', 'listBarang', 'listTeknisi'));
     }
 
     /**
@@ -33,7 +38,9 @@ class PerbaikanController extends Controller
         ]);
 
         // Menyimpan data perbaikan
-        return Perbaikan::create($request->all());
+        Perbaikan::create($request->all());
+
+        return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil ditambahkan.');
     }
 
     /**
@@ -63,7 +70,7 @@ class PerbaikanController extends Controller
         // Update data perbaikan
         $perbaikan->update($request->all());
 
-        return $perbaikan;
+        return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil diperbarui.');
     }
 
     /**
@@ -74,6 +81,6 @@ class PerbaikanController extends Controller
         // Hapus data perbaikan
         $perbaikan->delete();
 
-        return response()->json(['message' => 'Data perbaikan berhasil dihapus.']);
+        return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil dihapus.');
     }
 }

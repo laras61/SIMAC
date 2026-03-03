@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Maintenance;
+use App\Models\Barang;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MaintenanceController extends Controller
@@ -14,7 +16,10 @@ class MaintenanceController extends Controller
     public function index()
     {
         $items = Maintenance::with(['barang', 'user'])->latest('id_maintenance')->get();
-        return view('maintenance.index', compact('items'));
+        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
+        $listTeknisi = User::where('role', 'teknisi')->select('id_user', 'nama')->get();
+        
+        return view('maintenance.index', compact('items', 'listBarang', 'listTeknisi'));
     }
 
     /**
@@ -34,7 +39,9 @@ class MaintenanceController extends Controller
         ]);
 
         // Menyimpan data maintenance
-        return Maintenance::create($request->all());
+        Maintenance::create($request->all());
+
+        return redirect()->route('maintenance.index')->with('success', 'Jadwal maintenance berhasil ditambahkan.');
     }
 
     /**
@@ -65,7 +72,7 @@ class MaintenanceController extends Controller
         // Update data maintenance
         $maintenance->update($request->all());
 
-        return $maintenance;
+        return redirect()->route('maintenance.index')->with('success', 'Data maintenance berhasil diperbarui.');
     }
 
     /**
@@ -76,6 +83,6 @@ class MaintenanceController extends Controller
         // Hapus data maintenance
         $maintenance->delete();
 
-        return response()->json(['message' => 'Data maintenance berhasil dihapus.']);
+        return redirect()->route('maintenance.index')->with('success', 'Data maintenance berhasil dihapus.');
     }
 }

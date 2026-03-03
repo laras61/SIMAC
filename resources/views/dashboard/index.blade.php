@@ -147,24 +147,41 @@
     <div class="wrap">
         <div class="top">
             <div>
-                <h1>Dashboard SIMAC</h1>
-                <p class="sub">Informasi operasional AC</p>
+                <h1>Dashboard Admin</h1>
+                <p class="sub">Selamat datang kembali, {{ Auth::user()->nama }}</p>
             </div>
+            <form action="{{ route('logout') }}" method="POST" style="margin-left: auto;">
+                @csrf
+                <button type="submit" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer;">Logout</button>
+            </form>
         </div>
 
         <div class="stats">
             <div class="card">
-                <div class="label">Total Barang</div>
-                <div class="value">{{ count($maintenancePlans) }}</div>
+                <div class="label">Total Aset AC</div>
+                <div class="value">142</div>
             </div>
             <div class="card">
-                <div class="label">Maintenance Lewat Due</div>
-                <div class="value">{{ $dueCount }}</div>
+                <div class="label">Perlu Maintenance</div>
+                <div class="value" style="color: var(--danger);">8</div>
             </div>
             <div class="card">
-                <div class="label">Maintenance Mendekati Due</div>
-                <div class="value">{{ $nearDueCount }}</div>
+                <div class="label">Perbaikan Aktif</div>
+                <div class="value" style="color: var(--amber);">3</div>
             </div>
+            <div class="card">
+                <div class="label">Jadwal Bulan Ini</div>
+                <div class="value">12</div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            @foreach($adminMenus as $menu)
+            <a href="{{ route($menu['route']) }}" class="menu-item">
+                <h3 class="menu-title">{{ $menu['name'] }}</h3>
+                <p class="menu-desc">{{ $menu['desc'] }}</p>
+            </a>
+            @endforeach
         </div>
 
         <div class="panel">

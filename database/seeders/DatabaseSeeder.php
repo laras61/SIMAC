@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             MaintenanceSeeder::class,
             PerbaikanSeeder::class,
             RemainderSeeder::class,
+            VendorSeeder::class,
         ]);
     }
 }
