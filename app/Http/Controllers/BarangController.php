@@ -13,14 +13,32 @@ class BarangController extends Controller
      */
     public function index()
     {
-        $items = Barang::query()->latest('id_ac')->get();
+        $query = Barang::query();
+        $search = trim((string) request('q', ''));
+        $status = trim((string) request('status', ''));
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_bmn', 'like', '%' . $search . '%')
+                    ->orWhere('merk', 'like', '%' . $search . '%')
+                    ->orWhere('serial_number', 'like', '%' . $search . '%')
+                    ->orWhere('tipe_ac', 'like', '%' . $search . '%')
+                    ->orWhere('lokasi', 'like', '%' . $search . '%');
+            });
+        }
+
+        if (in_array($status, ['aktif', 'rusak', 'nonaktif'], true)) {
+            $query->where('status', $status);
+        }
+
+        $items = $query->latest('id_ac')->get();
         $editItem = null;
 
         if (request()->filled('edit')) {
             $editItem = Barang::find(request('edit'));
         }
 
-        return view('barang.index', compact('items', 'editItem'));
+        return view('barang.index', compact('items', 'editItem', 'search', 'status'));
     }
 
     /**
