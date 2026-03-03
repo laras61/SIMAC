@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Perbaikan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rule;
 
 class PerbaikanController extends Controller
 {
@@ -23,17 +24,26 @@ class PerbaikanController extends Controller
     public function insert(Request $request)
     {
         // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'tanggal_perbaikan' => 'required|date',
             'jenis_perbaikan' => 'required|string',
             'deskripsi' => 'nullable|string',
             'id_user' => 'required|exists:users,id_user',
             'biaya' => 'nullable|numeric',
+            'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
         ]);
 
         // Menyimpan data perbaikan
-        return Perbaikan::create($request->all());
+        return Perbaikan::create([
+            'id_ac' => $validated['id_ac'],
+            'tanggal_perbaikan' => $validated['tanggal_perbaikan'],
+            'jenis_perbaikan' => $validated['jenis_perbaikan'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'id_user' => $validated['id_user'],
+            'biaya' => $validated['biaya'] ?? null,
+            'status' => $validated['status'] ?? 'baru',
+        ]);
     }
 
     /**
@@ -51,17 +61,26 @@ class PerbaikanController extends Controller
     public function update(Request $request, Perbaikan $perbaikan)
     {
         // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'tanggal_perbaikan' => 'required|date',
             'jenis_perbaikan' => 'required|string',
             'deskripsi' => 'nullable|string',
             'id_user' => 'required|exists:users,id_user',
             'biaya' => 'nullable|numeric',
+            'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
         ]);
 
         // Update data perbaikan
-        $perbaikan->update($request->all());
+        $perbaikan->update([
+            'id_ac' => $validated['id_ac'],
+            'tanggal_perbaikan' => $validated['tanggal_perbaikan'],
+            'jenis_perbaikan' => $validated['jenis_perbaikan'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'id_user' => $validated['id_user'],
+            'biaya' => $validated['biaya'] ?? null,
+            'status' => $validated['status'] ?? $perbaikan->status,
+        ]);
 
         return $perbaikan;
     }

@@ -19,6 +19,7 @@ class Perbaikan extends Model
         'deskripsi',
         'id_user',
         'biaya',
+        'status',
     ];
 
     // Relasi ke Barang

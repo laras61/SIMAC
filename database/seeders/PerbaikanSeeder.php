@@ -32,6 +32,7 @@ class PerbaikanSeeder extends Seeder
                 'deskripsi' => 'Kapasitor fan outdoor lemah, diganti baru',
                 'id_user' => $userTeknisi->id_user,
                 'biaya' => 150000,
+                'status' => 'selesai',
             ]);
         }
 
@@ -43,6 +44,7 @@ class PerbaikanSeeder extends Seeder
                 'deskripsi' => 'Tekanan freon rendah, indikasi bocor halus',
                 'id_user' => $userTeknisi->id_user,
                 'biaya' => 350000,
+                'status' => 'proses',
             ]);
         }
     }
