@@ -88,7 +88,7 @@ class DashboardController extends Controller
 
     public function teknisi()
     {
-        if (Auth::user()->role !== 'teknisi') {
+        if (Auth::user()->role !== 'staff') {
             return redirect()->route('dashboard');
         }
         
