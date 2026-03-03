@@ -36,13 +36,13 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'no_hp' => 'nullable|string|max:15',
-            'role' => ['nullable', Rule::in(['admin', 'teknisi'])],
+            'role' => ['nullable', Rule::in(['admin', 'staff'])],
         ]);
 
         User::create([
             ...$validated,
             'password' => Hash::make($validated['password']),
-            'role' => $validated['role'] ?? 'teknisi',
+            'role' => $validated['role'] ?? 'staff',
         ]);
 
         return redirect()
@@ -69,7 +69,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
             'password' => 'nullable|string|min:8', // Password opsional saat update
             'no_hp' => 'nullable|string|max:15',
-            'role' => ['nullable', Rule::in(['admin', 'teknisi'])],
+            'role' => ['nullable', Rule::in(['admin', 'staff'])],
         ]);
 
         $data = [
