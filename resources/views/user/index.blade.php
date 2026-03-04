@@ -117,7 +117,7 @@
                 @endif
 
                 @php
-                    $roleOptions = ['admin', 'teknisi', 'staff'];
+                    $roleOptions = ['admin', 'staff'];
                 @endphp
 
                 @if ($editItem)

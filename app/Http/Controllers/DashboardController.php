@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
+use Carbon\Carbon;
+use App\Models\Barang;
+use App\Models\Perbaikan;
+use App\Models\Maintenance;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -13,90 +16,79 @@ class DashboardController extends Controller
             return redirect()->route('teknisi.dashboard');
         }
 
-        $adminMenus = [
-            ['name' => 'Barang', 'route' => 'barang.index', 'desc' => 'Data master aset AC'],
-            ['name' => 'User', 'route' => 'user.index', 'desc' => 'Kelola akun pengguna'],
-            ['name' => 'Maintenance', 'route' => 'maintenance.index', 'desc' => 'Jadwal dan progres maintenance'],
-            ['name' => 'Perbaikan', 'route' => 'perbaikan.index', 'desc' => 'Riwayat tindakan perbaikan'],
-            ['name' => 'Reminder', 'route' => 'remainder.index', 'desc' => 'Pengingat email maintenance/perbaikan'],
-        ];
+        $today = Carbon::today();
+        $nearDueLimit = $today->copy()->addDays(30);
 
-        $maintenancePlans = [
-            [
-                'aset' => 'BMN-001 / Ruang Server',
-                'last_date' => '2026-01-10',
-                'next_due' => '2026-07-10',
-                'teknisi' => 'Budi Teknisi',
-                'pic' => 'Andi (GA)',
-                'status' => 'Terjadwal',
-            ],
-            [
-                'aset' => 'BMN-002 / Lobby Utama',
-                'last_date' => '2025-12-05',
-                'next_due' => '2026-06-05',
-                'teknisi' => 'Raka AC Team',
-                'pic' => 'Andi (GA)',
-                'status' => 'Mendekati due',
-            ],
-            [
-                'aset' => 'BMN-003 / Aula Pertemuan',
-                'last_date' => '2025-08-20',
-                'next_due' => '2026-02-20',
-                'teknisi' => 'Budi Teknisi',
-                'pic' => 'Andi (GA)',
-                'status' => 'Lewat due',
-            ],
-        ];
+        $latestMaintenanceByAc = Maintenance::with('user:id_user,nama')
+            ->whereNotNull('tanggal_dikerjakan')
+            ->orderByDesc('tanggal_dikerjakan')
+            ->orderByDesc('id_maintenance')
+            ->get()
+            ->unique('id_ac')
+            ->keyBy('id_ac');
 
-        $repairHistories = [
-            [
-                'tanggal' => '2026-02-14',
-                'aset' => 'BMN-003 / Aula',
-                'jenis' => 'Ganti freon',
-                'freon' => 'Ya',
-                'part' => 'Valve service + pipa sambungan',
-                'teknisi' => 'Budi Teknisi',
-                'pic' => 'Andi (GA)',
-                'status' => 'Selesai',
-            ],
-            [
-                'tanggal' => '2026-01-09',
-                'aset' => 'BMN-001 / Server',
-                'jenis' => 'Perbaikan unit indoor',
-                'freon' => 'Tidak',
-                'part' => 'Fan motor',
-                'teknisi' => 'Raka AC Team',
-                'pic' => 'Andi (GA)',
-                'status' => 'Selesai',
-            ],
-        ];
+        $barangs = Barang::query()
+            ->orderBy('kode_bmn')
+            ->get();
 
-        $emailReminders = [
-            [
-                'tujuan' => 'pic.facility@company.com',
-                'trigger' => 'H-7 jatuh tempo maintenance',
-                'isi' => 'Pengingat jadwal maintenance 6 bulanan',
-                'status' => 'Aktif',
-            ],
-            [
-                'tujuan' => 'teknisi.vendor@company.com',
-                'trigger' => 'Tiket perbaikan dibuat',
-                'isi' => 'Notifikasi pekerjaan perbaikan baru',
-                'status' => 'Aktif',
-            ],
-        ];
+        $maintenancePlans = $barangs->map(function (Barang $barang) use ($latestMaintenanceByAc, $today, $nearDueLimit) {
+            $lastMaintenance = $latestMaintenanceByAc->get($barang->id_ac);
+            $lastDateRaw = $lastMaintenance?->tanggal_dikerjakan ?: $barang->tgl_instalasi;
+            $lastDate = Carbon::parse($lastDateRaw);
+            $nextDue = $lastDate->copy()->addMonthsNoOverflow(6);
+
+            if ($nextDue->lt($today)) {
+                $statusDue = 'Lewat due';
+            } elseif ($nextDue->lte($nearDueLimit)) {
+                $statusDue = 'Mendekati due';
+            } else {
+                $statusDue = 'Terjadwal';
+            }
+
+            return [
+                'aset' => $barang->kode_bmn . ' / ' . $barang->lokasi,
+                'last_date' => $lastDate->format('Y-m-d'),
+                'next_due' => $nextDue->format('Y-m-d'),
+                'teknisi' => $lastMaintenance?->user?->nama ?? '-',
+                'pic' => '-',
+                'status' => $statusDue,
+            ];
+        })
+            ->filter(function (array $plan) use ($nearDueLimit) {
+                return Carbon::parse($plan['next_due'])->lte($nearDueLimit);
+            })
+            ->sortBy('next_due')
+            ->values();
+
+        $repairHistories = Perbaikan::with('barang:id_ac,kode_bmn,lokasi')
+            ->orderByDesc('tanggal_perbaikan')
+            ->orderByDesc('id_perbaikan')
+            ->take(10)
+            ->get()
+            ->map(function (Perbaikan $perbaikan) {
+                return [
+                    'tanggal' => $perbaikan->tanggal_perbaikan,
+                    'aset' => ($perbaikan->barang->kode_bmn ?? '-') . ' / ' . ($perbaikan->barang->lokasi ?? '-'),
+                    'keterangan' => $perbaikan->jenis_perbaikan . (! empty($perbaikan->deskripsi) ? ' | ' . $perbaikan->deskripsi : ''),
+                ];
+            });
+
+        $totalBarang = $barangs->count();
+        $dueCount = $maintenancePlans->where('status', 'Lewat due')->count();
+        $nearDueCount = $maintenancePlans->where('status', 'Mendekati due')->count();
 
         return view('dashboard.index', [
-            'adminMenus' => $adminMenus,
+            'totalBarang' => $totalBarang,
+            'dueCount' => $dueCount,
+            'nearDueCount' => $nearDueCount,
             'maintenancePlans' => $maintenancePlans,
             'repairHistories' => $repairHistories,
-            'emailReminders' => $emailReminders,
         ]);
     }
 
     public function teknisi()
     {
-        if (Auth::user()->role !== 'teknisi') {
+        if (Auth::user()->role !== 'staff') {
             return redirect()->route('dashboard');
         }
         

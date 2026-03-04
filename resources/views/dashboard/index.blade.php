@@ -139,11 +139,6 @@
 <body>
     @include('partials.nav')
 
-    @php
-        $dueCount = collect($maintenancePlans)->where('status', 'Lewat due')->count();
-        $nearDueCount = collect($maintenancePlans)->where('status', 'Mendekati due')->count();
-    @endphp
-
     <div class="wrap">
         <div class="top">
             <div>
@@ -158,8 +153,13 @@
 
         <div class="stats">
             <div class="card">
+<<<<<<< HEAD
                 <div class="label">Total Aset AC</div>
                 <div class="value">142</div>
+=======
+                <div class="label">Total Barang</div>
+                <div class="value">{{ $totalBarang }}</div>
+>>>>>>> fa1d8c7e7e46777adabc31f48900594632d093e0
             </div>
             <div class="card">
                 <div class="label">Perlu Maintenance</div>
@@ -185,7 +185,7 @@
         </div>
 
         <div class="panel">
-            <h2>Maintenance 6 Bulan (Wajib Ditindak)</h2>
+            <h2>Maintenance 30 Hari Ke Depan (Termasuk Lewat Due)</h2>
             <table>
                 <thead>
                     <tr>
@@ -197,7 +197,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($maintenancePlans as $row)
+                    @forelse ($maintenancePlans as $row)
                         <tr>
                             <td>{{ $row['aset'] }}</td>
                             <td>{{ $row['next_due'] }}</td>
@@ -213,7 +213,11 @@
                                 @endif
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5">Tidak ada AC yang perlu maintenance dalam 30 hari ke depan.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -229,27 +233,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($repairHistories as $row)
+                    @forelse ($repairHistories as $row)
                         <tr>
                             <td>{{ $row['tanggal'] }}</td>
                             <td>{{ $row['aset'] }}</td>
-                            <td>
-                                @php
-                                    $keteranganParts = [];
-                                    if (!empty($row['part'])) {
-                                        $keteranganParts[] = 'Part: ' . $row['part'];
-                                    }
-                                    if (!empty($row['freon'])) {
-                                        $keteranganParts[] = 'Freon: ' . $row['freon'];
-                                    }
-                                    if (!empty($row['keterangan'])) {
-                                        $keteranganParts[] = $row['keterangan'];
-                                    }
-                                @endphp
-                                {{ count($keteranganParts) ? implode(' | ', $keteranganParts) : '-' }}
-                            </td>
+                            <td>{{ $row['keterangan'] }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="3">Belum ada riwayat perbaikan.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
