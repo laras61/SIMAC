@@ -216,7 +216,7 @@
                 <button type="button" class="btn btn-close" onclick="closeTambahModal()">Tutup</button>
             </div>
 
-            <form method="POST" action="{{ route('user.insert') }}" id="addUserForm">
+            <form method="POST" action="{{ route('user.insert') }}">
                 @csrf
                 <div class="form-grid">
                     <div class="field">
@@ -244,12 +244,11 @@
                     </div>
                     <div class="field">
                         <label for="add_password">Password</label>
-                        <input id="add_password" type="password" name="password" required minlength="8" oninput="validatePassword(this)">
-                        <span id="passwordError" style="color: #991b1b; font-size: 11px; display: none;">Password minimal 8 karakter</span>
+                        <input id="add_password" type="password" name="password" required>
                     </div>
                 </div>
                 <div class="actions">
-                    <button type="submit" class="btn btn-primary" id="btnSubmitAdd">Simpan</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                     <button type="button" class="btn btn-soft" onclick="closeTambahModal()">Batal</button>
                 </div>
             </form>
@@ -264,25 +263,6 @@
         function closeTambahModal() {
             const modal = document.getElementById('tambahUserModal');
             if (modal) modal.classList.remove('open');
-        }
-
-        function validatePassword(input) {
-            const errorSpan = document.getElementById('passwordError');
-            const submitBtn = document.getElementById('btnSubmitAdd');
-            
-            if (input.value.length > 0 && input.value.length < 8) {
-                errorSpan.style.display = 'block';
-                input.style.borderColor = '#dc2626';
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.5';
-                submitBtn.style.cursor = 'not-allowed';
-            } else {
-                errorSpan.style.display = 'none';
-                input.style.borderColor = '#fdba74';
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
-                submitBtn.style.cursor = 'pointer';
-            }
         }
     </script>
 </body>

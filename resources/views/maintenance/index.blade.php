@@ -6,8 +6,9 @@
     <title>Maintenance - SIMAC</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: #fff7ed; color: #431407; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1f2937; }
         .wrap { width: min(1100px, calc(100% - 28px)); margin: 18px auto 32px; }
+<<<<<<< HEAD
         
         /* Panel Styles aligned with User Page */
         .panel {
@@ -224,6 +225,14 @@
         .btn-cancel:hover {
             background: #fff7ed;
         }
+=======
+        .panel { background: #fff; border: 1px solid #e2e8f0; border-top: 3px solid #0f766e; border-radius: 12px; padding: 14px; box-shadow: 0 4px 10px rgba(15,23,42,.04); }
+        h1 { margin: 0 0 4px; font-size: 24px; color: #0f172a; }
+        .sub { margin: 0 0 14px; color: #64748b; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        th { color: #64748b; background: #f8fafc; }
+>>>>>>> 8e67d41312beb5b1f3989d3c877300b6f5c140ed
     </style>
 </head>
 <body>
@@ -433,3 +442,4 @@
     </script>
 </body>
 </html>
+

@@ -6,9 +6,8 @@
     <title>Perbaikan - SIMAC</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: #fff7ed; color: #431407; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1f2937; }
         .wrap { width: min(1100px, calc(100% - 28px)); margin: 18px auto 32px; }
-        
         /* Panel Styles aligned with User Page */
         .panel {
             background: #fff;
@@ -440,3 +439,4 @@
     </script>
 </body>
 </html>
+
