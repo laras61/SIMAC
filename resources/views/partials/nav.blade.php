@@ -47,21 +47,21 @@
     }
     .app-menu a {
         text-decoration: none;
-        color: #334155;
+        color: #475569;
         font-size: 13px;
         padding: 7px 10px;
         border-radius: 8px;
     }
     .app-menu a:hover {
-        background: #f1f5f9;
+        background: #f8fafc;
     }
     .app-menu .active {
-        background: #e0f2fe;
+        background: #ccfbf1;
         color: #0f766e;
         font-weight: 600;
     }
     .app-menu .logout-btn {
-        border: 1px solid #fecaca;
+        border: 1px solid #e2e8f0;
         color: #b91c1c;
         background: #fff;
         border-radius: 8px;

@@ -7,41 +7,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #fff7ed;
+            --bg: #f8fafc;
             --surface: #ffffff;
-            --text: #431407;
-            --muted: #9a3412;
-            --line: #fed7aa;
-            --primary: #ea580c;
-            --primary-dark: #c2410c;
-            --amber: #d97706;
+            --text: #1f2937;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --primary: #0f766e;
             --ok: #166534;
-            --warn: #b45309;
+            --warn: #92400e;
             --danger: #b91c1c;
-            --orange-soft: #fff7ed;
-            --amber-soft: #fffbeb;
-            --cream-soft: #ffedd5;
+            --ok-soft: #dcfce7;
+            --warn-soft: #fef3c7;
+            --danger-soft: #fee2e2;
         }
         * { box-sizing: border-box; }
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at top right, #ffedd5 0%, var(--bg) 45%, #ffffff 100%);
+            background: var(--bg);
             color: var(--text);
         }
         .wrap {
             width: min(1040px, calc(100% - 28px));
             margin: 18px auto 32px;
         }
-        .top {
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 14px;
+        .header {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
         }
-        h1 { margin: 0; font-size: 24px; }
-        .sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+        h1 { margin: 0; font-size: 24px; color: #0f172a; }
+        .sub { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -53,50 +51,16 @@
             border: 1px solid var(--line);
             border-radius: 12px;
             padding: 12px;
-            box-shadow: 0 10px 24px rgba(194, 65, 12, 0.08);
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
         }
-        .stats .card:nth-child(1) { background: linear-gradient(180deg, #ffedd5, #ffffff); }
-        .stats .card:nth-child(2) { background: linear-gradient(180deg, #fee2e2, #ffffff); }
-        .stats .card:nth-child(3) { background: linear-gradient(180deg, #fef3c7, #ffffff); }
-        .stats .card:nth-child(4) { background: linear-gradient(180deg, #fffbeb, #ffffff); }
         .card .label { color: var(--muted); font-size: 12px; }
-        .card .value { margin-top: 6px; font-size: 22px; font-weight: 700; color: var(--primary-dark); }
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 10px;
-            margin-bottom: 12px;
+        .card .value { margin-top: 6px; font-size: 22px; font-weight: 700; color: #0f172a; }
+        .card.primary {
+            border-left: 4px solid #0f766e;
+            background: #f0fdfa;
         }
-        .menu-item {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 12px;
-            border-top: 3px solid var(--primary);
-            box-shadow: 0 10px 24px rgba(194, 65, 12, 0.08);
-            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-        }
-        .menu-item:hover {
-            border-color: #fdba74;
-            background: #fffaf5;
-            transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(194, 65, 12, 0.12);
-        }
-        .menu-title {
-            font-size: 14px;
-            font-weight: 700;
-            margin: 0 0 4px;
-            color: var(--primary-dark);
-        }
-        .menu-desc {
-            margin: 0;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.4;
-        }
+        .card.warn { border-left: 4px solid #f59e0b; }
+        .card.danger { border-left: 4px solid #ef4444; }
         .panel {
             background: var(--surface);
             border: 1px solid var(--line);
@@ -104,10 +68,24 @@
             padding: 12px;
             margin-bottom: 10px;
             overflow-x: auto;
-            box-shadow: 0 12px 26px rgba(194, 65, 12, 0.08);
-            border-top: 3px solid #fb923c;
         }
-        .panel h2 { margin: 0 0 10px; font-size: 16px; color: var(--primary-dark); }
+        .table-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .table-head h2 { margin: 0; font-size: 16px; color: #0f172a; }
+        .table-meta {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            background: #f8fafc;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -116,10 +94,10 @@
         th, td {
             text-align: left;
             padding: 8px 6px;
-            border-bottom: 1px solid #ffedd5;
+            border-bottom: 1px solid var(--line);
             white-space: nowrap;
         }
-        th { color: var(--muted); font-weight: 600; background: #fff7ed; }
+        th { color: var(--muted); font-weight: 600; background: #f8fafc; }
         .badge {
             display: inline-block;
             border-radius: 999px;
@@ -127,43 +105,47 @@
             font-size: 11px;
             font-weight: 600;
         }
-        .ok { color: var(--ok); background: #dcfce7; }
-        .warn { color: #92400e; background: #fef3c7; }
-        .danger { color: var(--danger); background: #fee2e2; }
+        .ok { color: var(--ok); background: var(--ok-soft); }
+        .warn { color: var(--warn); background: var(--warn-soft); }
+        .danger { color: var(--danger); background: var(--danger-soft); }
 
-        .panel:nth-of-type(1) { border-top-color: #f97316; }
-        .panel:nth-of-type(2) { border-top-color: #fb923c; }
-        .panel:nth-of-type(3) { border-top-color: #f59e0b; }
+        @media (max-width: 560px) {
+            .table-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
     @include('partials.nav')
 
     <div class="wrap">
-        <div class="top">
-            <div>
-                <h1>Dashboard SIMAC</h1>
-                <p class="sub">Informasi operasional AC</p>
-            </div>
+        <div class="header">
+            <h1>Dashboard SIMAC</h1>
+            <p class="sub">Ringkasan data operasional AC.</p>
         </div>
 
         <div class="stats">
-            <div class="card">
+            <div class="card primary">
                 <div class="label">Total Barang</div>
                 <div class="value">{{ $totalBarang }}</div>
             </div>
-            <div class="card">
+            <div class="card danger">
                 <div class="label">Maintenance Lewat Due</div>
                 <div class="value">{{ $dueCount }}</div>
             </div>
-            <div class="card">
+            <div class="card warn">
                 <div class="label">Maintenance Mendekati Due</div>
                 <div class="value">{{ $nearDueCount }}</div>
             </div>
         </div>
 
         <div class="panel">
-            <h2>Maintenance 30 Hari Ke Depan (Termasuk Lewat Due)</h2>
+            <div class="table-head">
+                <h2>Maintenance 30 Hari Ke Depan</h2>
+                <span class="table-meta">{{ $maintenancePlans->count() }} data</span>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -201,7 +183,10 @@
         </div>
 
         <div class="panel">
-            <h2>Riwayat Perbaikan Terbaru</h2>
+            <div class="table-head">
+                <h2>Riwayat Perbaikan Terbaru</h2>
+                <span class="table-meta">{{ $repairHistories->count() }} data</span>
+            </div>
             <table>
                 <thead>
                     <tr>
