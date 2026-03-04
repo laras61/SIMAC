@@ -6,440 +6,347 @@
     <title>Maintenance - SIMAC</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1f2937; }
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --muted: #0f172a;
+            --line: #e2e8f0;
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --danger: #b91c1c;
+            --cream-soft: #e2e8f0;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); }
         .wrap { width: min(1100px, calc(100% - 28px)); margin: 18px auto 32px; }
-<<<<<<< HEAD
-        
-        /* Panel Styles aligned with User Page */
-        .panel {
-            background: #fff;
-            border: 1px solid #fed7aa;
-            border-top: 3px solid #f97316;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 24px;
-            box-shadow: 0 12px 26px rgba(194,65,12,.08);
-            overflow-x: auto;
-        }
-        
-        h1 { margin: 0 0 4px; font-size: 24px; color: #9a3412; }
-        .sub { margin: 0 0 14px; color: #c2410c; font-size: 13px; }
-        
-        /* Alert Style */
-        .alert-success {
-            background: #dcfce7; 
-            color: #166534; 
-            padding: 12px 16px; 
-            border-radius: 8px; 
-            margin-bottom: 16px; 
-            border: 1px solid #bbf7d0;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* Button Styles */
-        .btn-add {
-            background: #ea580c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.2);
-            transition: all 0.2s;
-            font-family: inherit;
-            font-size: 14px;
-            display: inline-block;
-        }
-        .btn-add:hover {
-            background: #c2410c;
-            transform: translateY(-1px);
-        }
-
-        /* Table Styles */
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .table-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #9a3412;
-            margin: 0;
-        }
-        .table-meta {
-            font-size: 13px;
-            color: #9a3412;
-        }
-
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; padding: 12px 16px; color: #9a3412; font-weight: 700; border-bottom: none; }
-        td { text-align: left; padding: 16px; border-bottom: 1px solid #ffedd5; color: #431407; }
-        tr:last-child td { border-bottom: none; }
-        
-        /* Action Buttons */
-        .btn-action {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            border: none;
-            font-family: inherit;
-            margin-right: 4px;
-            color: white;
-        }
-        .btn-edit { background: #f59e0b; }
-        .btn-edit:hover { background: #d97706; }
-        .btn-delete { background: #ef4444; }
-        .btn-delete:hover { background: #dc2626; }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .stack { display: grid; gap: 12px; }
+        .page-head { padding: 2px 2px 6px; }
+        .panel { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 12px; padding: 14px; box-shadow: 0 12px 26px rgba(15,23,42,.06); overflow-x: auto; }
+        h1 { margin: 0 0 4px; font-size: 24px; color: var(--primary-dark); }
+        .sub { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 10px; }
+        .field { display: grid; gap: 4px; min-width: 0; }
+        .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+        .field input, .field select, .field textarea {
             width: 100%;
-            height: 100%;
-            background: rgba(67, 20, 7, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            max-width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text);
+            background: var(--surface);
         }
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-        .modal-box {
-            background: #fff;
-            border-radius: 16px;
-            width: min(700px, 90%);
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            position: relative;
-            border-top: 4px solid #f97316;
-        }
-        .modal-overlay.active .modal-box {
-            transform: translateY(0);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ffedd5;
-            padding-bottom: 12px;
-        }
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #9a3412;
-            margin: 0;
-        }
-        .btn-close {
-            background: none;
-            border: 1px solid #fed7aa;
-            color: #9a3412;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
+        .field textarea { resize: vertical; min-height: 92px; }
+        .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--line); outline-offset: 1px; }
+        .actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: inherit;
             font-size: 12px;
             font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-close:hover {
-            background: #fff7ed;
-            color: #c2410c;
-        }
-
-        /* Form Styles */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #9a3412;
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            padding: 10px;
-            border: 1px solid #fed7aa;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            background: #fff;
-            color: #431407;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #f97316;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-        }
-        .modal-footer {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-        .btn-submit {
-            background: #f97316;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-family: inherit;
-            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
-        .btn-submit:hover {
-            background: #c2410c;
-        }
-        .btn-cancel {
-            background: #fff;
-            color: #9a3412;
-            border: 1px solid #fed7aa;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-family: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-cancel:hover {
-            background: #fff7ed;
-        }
-=======
-        .panel { background: #fff; border: 1px solid #e2e8f0; border-top: 3px solid #0f766e; border-radius: 12px; padding: 14px; box-shadow: 0 4px 10px rgba(15,23,42,.04); }
-        h1 { margin: 0 0 4px; font-size: 24px; color: #0f172a; }
-        .sub { margin: 0 0 14px; color: #64748b; font-size: 13px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-warning { background: #475569; color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-soft { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+        .btn-close { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-        th { color: #64748b; background: #f8fafc; }
->>>>>>> 8e67d41312beb5b1f3989d3c877300b6f5c140ed
+        th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--cream-soft); white-space: nowrap; }
+        th { color: var(--muted); background: var(--bg); }
+        .row-actions { display: flex; gap: 6px; }
+        .row-actions form { margin: 0; }
+        .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+        .filter-form { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px); gap: 8px; margin-bottom: 10px; align-items: end; }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+        .modal.open { display: flex; }
+        .modal-card { width: min(980px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; overflow-x: hidden; background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 12px; padding: 14px; box-shadow: 0 12px 26px rgba(15,23,42,.12); }
+        .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+        .modal-head h2 { margin: 0; font-size: 18px; color: var(--primary-dark); }
+        .modal .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        @media (max-width: 900px) { .form-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); } }
+        @media (max-width: 900px) { .modal .form-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 760px) { .filter-form { grid-template-columns: 1fr; } }
+        @media (max-width: 760px) { .panel-head { flex-direction: column; align-items: stretch; } }
+        @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
     @include('partials.nav')
+    @php
+        $statusOptions = ['pending', 'selesai'];
+        $jenisOptions = ['preventive', 'corrective'];
+    @endphp
     <div class="wrap">
-        <!-- Header Panel -->
-        <div class="panel">
-            <h1>Menu Maintenance</h1>
-            <p class="sub">Kelola jadwal dan data maintenance AC</p>
+        <div class="stack">
+            <div class="page-head">
+                @if ($editItem)
+                    <form method="POST" action="{{ route('maintenance.update', $editItem->id_maintenance) }}">
+                        @csrf
+                        @method('PATCH')
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="id_ac">Aset AC</label>
+                                <select id="id_ac" name="id_ac" required>
+                                    @foreach ($listBarang as $barang)
+                                        <option value="{{ $barang->id_ac }}" {{ (string) old('id_ac', $editItem->id_ac) === (string) $barang->id_ac ? 'selected' : '' }}>{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="id_user">Teknisi</label>
+                                <select id="id_user" name="id_user" required>
+                                    @foreach ($listTeknisi as $teknisi)
+                                        <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="tanggal_jadwal">Tanggal Jadwal</label>
+                                <input id="tanggal_jadwal" type="date" name="tanggal_jadwal" value="{{ old('tanggal_jadwal', $editItem->tanggal_jadwal) }}" required>
+                            </div>
+                            <div class="field">
+                                <label for="tanggal_dikerjakan">Tanggal Dikerjakan</label>
+                                <input id="tanggal_dikerjakan" type="date" name="tanggal_dikerjakan" value="{{ old('tanggal_dikerjakan', $editItem->tanggal_dikerjakan) }}">
+                            </div>
+                            <div class="field">
+                                <label for="jenis">Jenis</label>
+                                <select id="jenis" name="jenis" required>
+                                    @foreach ($jenisOptions as $jenis)
+                                        <option value="{{ $jenis }}" {{ old('jenis', $editItem->jenis) === $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="status">Status</label>
+                                <select id="status" name="status" required>
+                                    @foreach ($statusOptions as $statusOption)
+                                        <option value="{{ $statusOption }}" {{ old('status', $editItem->status) === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field" style="grid-column: 1 / -1;">
+                                <label for="catatan">Catatan</label>
+                                <textarea id="catatan" name="catatan">{{ old('catatan', $editItem->catatan) }}</textarea>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button type="submit" class="btn btn-warning">Update Data</button>
+                            <a href="{{ route('maintenance.index') }}" class="btn btn-soft">Batal Edit</a>
+                        </div>
+                    </form>
+                @endif
+            </div>
 
-            @if(session('success'))
-                <div class="alert-success">
-                    {{ session('success') }}
+            <div class="panel">
+                <div class="panel-head">
+                    <h1>Daftar Maintenance</h1>
+                    <button type="button" class="btn btn-primary" onclick="openTambahModal()">Tambah Maintenance</button>
                 </div>
-            @endif
-
-            <button class="btn-add" onclick="openModal()">
-                Tambah Maintenance
-            </button>
-        </div>
-
-        <!-- List Panel -->
-        <div class="panel">
-            <h1>Daftar Maintenance</h1>
-            <p class="sub">Total data: {{ $items->count() }}</p>
-            
-            <table>
-                <thead>
-                    <tr style="background: #fff7ed;">
-                        <th width="5%">No</th>
-                        <th>Tanggal Jadwal</th>
-                        <th>Barang</th>
-                        <th>Teknisi</th>
-                        <th>Jenis</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($items as $index => $row)
+                <p class="sub">Total data: {{ $items->count() }}</p>
+                <form method="GET" action="{{ route('maintenance.index') }}" class="filter-form" id="maintenanceFilterForm">
+                    <div class="field">
+                        <label for="q">Pencarian</label>
+                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Aset, teknisi, jenis, status">
+                    </div>
+                    <div class="field">
+                        <label for="status_filter">Filter Status</label>
+                        <select id="status_filter" name="status">
+                            <option value="">Semua status</option>
+                            @foreach ($statusOptions as $statusOption)
+                                <option value="{{ $statusOption }}" {{ request('status') === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $row->tanggal_jadwal }}</td>
-                            <td>
-                                <div style="font-weight: 600;">{{ optional($row->barang)->kode_bmn }}</div>
-                                <div style="font-size: 11px; color: #9a3412;">{{ optional($row->barang)->merk ?? '-' }}</div>
-                            </td>
-                            <td>{{ optional($row->user)->nama ?? '-' }}</td>
-                            <td>
-                                <span style="background: {{ $row->jenis == 'preventive' ? '#dbeafe' : '#fee2e2' }}; color: {{ $row->jenis == 'preventive' ? '#1e40af' : '#991b1b' }}; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;">
-                                    {{ ucfirst($row->jenis) }}
-                                </span>
-                            </td>
-                            <td>
-                                <span style="background: {{ $row->status == 'selesai' ? '#dcfce7' : '#fef9c3' }}; color: {{ $row->status == 'selesai' ? '#166534' : '#854d0e' }}; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;">
-                                    {{ ucfirst($row->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn-action btn-edit" onclick="editItem({{ $row->id_maintenance }})">Edit</button>
-                                <form action="{{ route('maintenance.destroy', $row->id_maintenance) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete">Hapus</button>
-                                </form>
-                            </td>
+                            <th>No</th>
+                            <th>Tanggal Jadwal</th>
+                            <th>Tanggal Dikerjakan</th>
+                            <th>Barang</th>
+                            <th>Teknisi</th>
+                            <th>Jenis</th>
+                            <th>Status</th>
+                            <th>Catatan</th>
+                            <th>Aksi</th>
                         </tr>
-                    @empty
-                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: #9a3412;">Belum ada data maintenance.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse ($items as $row)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $row->tanggal_jadwal }}</td>
+                                <td>{{ $row->tanggal_dikerjakan ?: '-' }}</td>
+                                <td>{{ optional($row->barang)->kode_bmn ?? '-' }} - {{ optional($row->barang)->merk ?? '-' }}</td>
+                                <td>{{ optional($row->user)->nama ?? '-' }}</td>
+                                <td>{{ $row->jenis }}</td>
+                                <td>{{ $row->status }}</td>
+                                <td>{{ $row->catatan ?: '-' }}</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a href="{{ route('maintenance.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_maintenance])) }}" class="btn btn-warning">Edit</a>
+                                        <form method="POST" action="{{ route('maintenance.destroy', $row->id_maintenance) }}" class="delete-form" data-item="{{ optional($row->barang)->kode_bmn ?? ('ID ' . $row->id_maintenance) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="9">Belum ada data.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Overlay -->
-    <div id="maintenanceModal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Tambah Maintenance</h3>
-                <button type="button" class="btn-close" onclick="closeModal()">Tutup</button>
+    <div id="tambahMaintenanceModal" class="modal {{ ($errors->any() && !$editItem) ? 'open' : '' }}">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h2>Tambah Maintenance</h2>
+                <button type="button" class="btn btn-close" onclick="closeTambahModal()">Tutup</button>
             </div>
-            
-            <form id="maintenanceForm" action="{{ route('maintenance.insert') }}" method="POST">
+            <form method="POST" action="{{ route('maintenance.insert') }}">
                 @csrf
-                <div id="methodField"></div>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="id_ac">Pilih Aset AC</label>
-                        <select name="id_ac" id="id_ac" required>
-                            <option value="">-- Pilih AC --</option>
-                            @foreach($listBarang as $barang)
-                                <option value="{{ $barang->id_ac }}">{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
+                    <div class="field">
+                        <label for="add_id_ac">Aset AC</label>
+                        <select id="add_id_ac" name="id_ac" required>
+                            <option value="">Pilih aset</option>
+                            @foreach ($listBarang as $barang)
+                                <option value="{{ $barang->id_ac }}" {{ (string) old('id_ac') === (string) $barang->id_ac ? 'selected' : '' }}>{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="id_user">Pilih Teknisi</label>
-                        <select name="id_user" id="id_user" required>
-                            <option value="">-- Pilih Teknisi --</option>
-                            @foreach($listTeknisi as $teknisi)
-                                <option value="{{ $teknisi->id_user }}">{{ $teknisi->nama }}</option>
+                    <div class="field">
+                        <label for="add_id_user">Teknisi</label>
+                        <select id="add_id_user" name="id_user" required>
+                            <option value="">Pilih teknisi</option>
+                            @foreach ($listTeknisi as $teknisi)
+                                <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user') === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="tanggal_jadwal">Tanggal Jadwal</label>
-                        <input type="date" name="tanggal_jadwal" id="tanggal_jadwal" required>
+                    <div class="field">
+                        <label for="add_tanggal_jadwal">Tanggal Jadwal</label>
+                        <input id="add_tanggal_jadwal" type="date" name="tanggal_jadwal" value="{{ old('tanggal_jadwal') }}" required>
                     </div>
-                    <div class="form-group">
-                        <label for="jenis">Jenis Maintenance</label>
-                        <select name="jenis" id="jenis" required>
-                            <option value="preventive">Preventive</option>
-                            <option value="corrective">Corrective</option>
+                    <div class="field">
+                        <label for="add_tanggal_dikerjakan">Tanggal Dikerjakan</label>
+                        <input id="add_tanggal_dikerjakan" type="date" name="tanggal_dikerjakan" value="{{ old('tanggal_dikerjakan') }}">
+                    </div>
+                    <div class="field">
+                        <label for="add_jenis">Jenis</label>
+                        @php $jenisTambah = old('jenis', 'preventive'); @endphp
+                        <select id="add_jenis" name="jenis" required>
+                            @foreach ($jenisOptions as $jenis)
+                                <option value="{{ $jenis }}" {{ $jenisTambah === $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                            @endforeach
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="status">Status Awal</label>
-                        <select name="status" id="status" required>
-                            <option value="pending">Pending</option>
-                            <option value="selesai">Selesai</option>
+                    <div class="field">
+                        <label for="add_status">Status</label>
+                        @php $statusTambah = old('status', 'pending'); @endphp
+                        <select id="add_status" name="status" required>
+                            @foreach ($statusOptions as $statusOption)
+                                <option value="{{ $statusOption }}" {{ $statusTambah === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
+                            @endforeach
                         </select>
                     </div>
+                    <div class="field" style="grid-column: 1 / -1;">
+                        <label for="add_catatan">Catatan</label>
+                        <textarea id="add_catatan" name="catatan">{{ old('catatan') }}</textarea>
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="catatan">Catatan Tambahan</label>
-                    <textarea name="catatan" id="catatan" rows="3" placeholder="Masukkan catatan jika ada..."></textarea>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="submit" class="btn-submit">Simpan</button>
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-close" onclick="closeTambahModal()">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Pass PHP data to JavaScript
-        const maintenanceData = @json($items);
+        const swalBaseConfig = { confirmButtonColor: '#0f766e' };
 
-        function openModal() {
-            // Reset form for insert
-            const form = document.getElementById('maintenanceForm');
-            form.action = "{{ route('maintenance.insert') }}";
-            document.getElementById('methodField').innerHTML = '';
-            document.getElementById('modalTitle').innerText = 'Tambah Maintenance';
-            
-            // Reset values
-            form.reset();
-            
-            const modal = document.getElementById('maintenanceModal');
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
+        @if (session('success'))
+            Swal.fire({ ...swalBaseConfig, icon: 'success', title: 'Berhasil', text: @json(session('success')), timer: 2200, showConfirmButton: false });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({ ...swalBaseConfig, icon: 'error', title: 'Gagal', text: @json(session('error')) });
+        @endif
+
+        @if ($errors->any())
+            Swal.fire({ ...swalBaseConfig, icon: 'warning', title: 'Validasi', text: @json($errors->first()) });
+        @endif
+
+        function openTambahModal() {
+            document.getElementById('tambahMaintenanceModal').classList.add('open');
         }
 
-        function closeModal() {
-            const modal = document.getElementById('maintenanceModal');
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+        function closeTambahModal() {
+            document.getElementById('tambahMaintenanceModal').classList.remove('open');
         }
 
-        function editItem(id) {
-            const item = maintenanceData.find(d => d.id_maintenance == id);
-            
-            if (!item) {
-                alert('Data tidak ditemukan');
-                return;
+        (function initAutoFilter() {
+            const form = document.getElementById('maintenanceFilterForm');
+            if (!form) return;
+
+            const searchInput = document.getElementById('q');
+            const statusSelect = document.getElementById('status_filter');
+            let debounceTimer = null;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function () { form.submit(); }, 350);
+                });
             }
 
-            // Populate form
-            document.getElementById('id_ac').value = item.id_ac;
-            document.getElementById('id_user').value = item.id_user;
-            document.getElementById('tanggal_jadwal').value = item.tanggal_jadwal;
-            document.getElementById('jenis').value = item.jenis;
-            document.getElementById('status').value = item.status;
-            document.getElementById('catatan').value = item.catatan || '';
-
-            // Setup form for update
-            const form = document.getElementById('maintenanceForm');
-            // Route for update: /maintenance/update/{id}
-            form.action = "{{ url('/maintenance/update') }}/" + id;
-            
-            // Add PUT method spoofing
-            document.getElementById('methodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
-            
-            document.getElementById('modalTitle').innerText = 'Edit Maintenance';
-
-            // Open modal
-            const modal = document.getElementById('maintenanceModal');
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('maintenanceModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function () { form.submit(); });
             }
-        });
+        })();
+
+        (function initDeleteConfirmation() {
+            const forms = document.querySelectorAll('.delete-form');
+            if (!forms.length) return;
+
+            forms.forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const itemName = form.dataset.item || 'data ini';
+
+                    Swal.fire({
+                        ...swalBaseConfig,
+                        icon: 'warning',
+                        title: 'Hapus Maintenance?',
+                        text: `Data ${itemName} akan dihapus permanen.`,
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, hapus',
+                        cancelButtonText: 'Batal',
+                        cancelButtonColor: '#0f172a'
+                    }).then(function (result) {
+                        if (result.isConfirmed) form.submit();
+                    });
+                });
+            });
+        })();
     </script>
 </body>
 </html>
-

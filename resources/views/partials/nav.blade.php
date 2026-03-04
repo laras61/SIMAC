@@ -119,6 +119,7 @@
             <a href="{{ route('maintenance.index') }}" class="{{ request()->routeIs('maintenance.*') ? 'active' : '' }}">Maintenance</a>
             <a href="{{ route('perbaikan.index') }}" class="{{ request()->routeIs('perbaikan.*') ? 'active' : '' }}">Perbaikan</a>
             <a href="{{ route('remainder.index') }}" class="{{ request()->routeIs('remainder.*') ? 'active' : '' }}">Reminder</a>
+            <a href="{{ route('vendor.index') }}" class="{{ request()->routeIs('vendor.*') ? 'active' : '' }}">Vendor</a>
 
             @auth
                 <form method="POST" action="{{ route('logout') }}">

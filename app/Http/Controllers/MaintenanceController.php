@@ -15,11 +15,42 @@ class MaintenanceController extends Controller
      */
     public function index()
     {
-        $items = Maintenance::with(['barang', 'user'])->latest('id_maintenance')->get();
+        $search = trim((string) request('q', ''));
+        $status = trim((string) request('status', ''));
+
+        $itemsQuery = Maintenance::with(['barang', 'user'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('jenis', 'like', '%' . $search . '%')
+                        ->orWhere('status', 'like', '%' . $search . '%')
+                        ->orWhereHas('barang', function ($barangQuery) use ($search) {
+                            $barangQuery->where('kode_bmn', 'like', '%' . $search . '%')
+                                ->orWhere('merk', 'like', '%' . $search . '%')
+                                ->orWhere('lokasi', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('nama', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when($status !== '', function ($query) use ($status) {
+                $query->where('status', $status);
+            });
+
+        $items = $itemsQuery->latest('id_maintenance')->get();
         $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
-        $listTeknisi = User::where('role', 'teknisi')->select('id_user', 'nama')->get();
-        
-        return view('maintenance.index', compact('items', 'listBarang', 'listTeknisi'));
+        $listTeknisi = User::query()
+            ->whereIn('role', ['teknisi', 'staff', 'admin'])
+            ->select('id_user', 'nama')
+            ->orderBy('nama')
+            ->get();
+
+        $editItem = null;
+        if (request()->filled('edit')) {
+            $editItem = Maintenance::with(['barang', 'user'])->find(request('edit'));
+        }
+
+        return view('maintenance.index', compact('items', 'listBarang', 'listTeknisi', 'editItem', 'search', 'status'));
     }
 
     /**
@@ -27,8 +58,7 @@ class MaintenanceController extends Controller
      */
     public function insert(Request $request)
     {
-        // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'id_user' => 'required|exists:users,id_user',
             'tanggal_jadwal' => 'required|date',
@@ -38,8 +68,7 @@ class MaintenanceController extends Controller
             'status' => 'required|in:pending,selesai',
         ]);
 
-        // Menyimpan data maintenance
-        Maintenance::create($request->all());
+        Maintenance::create($validated);
 
         return redirect()->route('maintenance.index')->with('success', 'Jadwal maintenance berhasil ditambahkan.');
     }
@@ -58,8 +87,7 @@ class MaintenanceController extends Controller
      */
     public function update(Request $request, Maintenance $maintenance)
     {
-        // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'id_user' => 'required|exists:users,id_user',
             'tanggal_jadwal' => 'required|date',
@@ -69,8 +97,7 @@ class MaintenanceController extends Controller
             'status' => 'required|in:pending,selesai',
         ]);
 
-        // Update data maintenance
-        $maintenance->update($request->all());
+        $maintenance->update($validated);
 
         return redirect()->route('maintenance.index')->with('success', 'Data maintenance berhasil diperbarui.');
     }

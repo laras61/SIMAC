@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Remainder;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -13,8 +14,35 @@ class RemainderController extends Controller
      */
     public function index()
     {
-        $items = Remainder::with('barang')->latest('id_remainder')->get();
-        return view('remainder.index', compact('items'));
+        $search = trim((string) request('q', ''));
+        $status = trim((string) request('status', ''));
+
+        $itemsQuery = Remainder::with('barang')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('jenis', 'like', '%' . $search . '%')
+                        ->orWhere('email_tujuan', 'like', '%' . $search . '%')
+                        ->orWhere('status_kirim', 'like', '%' . $search . '%')
+                        ->orWhereHas('barang', function ($barangQuery) use ($search) {
+                            $barangQuery->where('kode_bmn', 'like', '%' . $search . '%')
+                                ->orWhere('merk', 'like', '%' . $search . '%')
+                                ->orWhere('lokasi', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when($status !== '', function ($query) use ($status) {
+                $query->where('status_kirim', $status);
+            });
+
+        $items = $itemsQuery->latest('id_remainder')->get();
+        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->orderBy('kode_bmn')->get();
+
+        $editItem = null;
+        if (request()->filled('edit')) {
+            $editItem = Remainder::find(request('edit'));
+        }
+
+        return view('remainder.index', compact('items', 'listBarang', 'editItem', 'search', 'status'));
     }
 
     /**
@@ -22,8 +50,7 @@ class RemainderController extends Controller
      */
     public function insert(Request $request)
     {
-        // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'tanggal_kirim' => 'required|date',
             'jenis' => 'required|in:maintenance,perbaikan',
@@ -31,8 +58,9 @@ class RemainderController extends Controller
             'status_kirim' => 'required|string',
         ]);
 
-        // Menyimpan data remainder
-        return Remainder::create($request->all());
+        Remainder::create($validated);
+
+        return redirect()->route('remainder.index')->with('success', 'Data reminder berhasil ditambahkan.');
     }
 
     /**
@@ -49,8 +77,7 @@ class RemainderController extends Controller
      */
     public function update(Request $request, Remainder $remainder)
     {
-        // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'tanggal_kirim' => 'required|date',
             'jenis' => 'required|in:maintenance,perbaikan',
@@ -58,10 +85,9 @@ class RemainderController extends Controller
             'status_kirim' => 'required|string',
         ]);
 
-        // Update data remainder
-        $remainder->update($request->all());
+        $remainder->update($validated);
 
-        return $remainder;
+        return redirect()->route('remainder.index')->with('success', 'Data reminder berhasil diperbarui.');
     }
 
     /**
@@ -69,9 +95,8 @@ class RemainderController extends Controller
      */
     public function destroy(Remainder $remainder)
     {
-        // Hapus data remainder
         $remainder->delete();
 
-        return response()->json(['message' => 'Data remainder berhasil dihapus.']);
+        return redirect()->route('remainder.index')->with('success', 'Data reminder berhasil dihapus.');
     }
 }

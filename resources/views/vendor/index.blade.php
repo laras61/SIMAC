@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perbaikan - SIMAC</title>
+    <title>Vendor - SIMAC</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -83,43 +83,54 @@
 <body>
     @include('partials.nav')
     @php
-        $statusOptions = ['baru', 'proses', 'selesai'];
+        $layananOptions = ['maintenance', 'perbaikan'];
+        $statusOptions = ['aktif', 'nonaktif'];
     @endphp
     <div class="wrap">
         <div class="stack">
             <div class="page-head">
                 @if ($editItem)
-                    <form method="POST" action="{{ route('perbaikan.update', $editItem->id_perbaikan) }}">
+                    <form method="POST" action="{{ route('vendor.update', $editItem->id_vendor) }}">
                         @csrf
                         @method('PATCH')
                         <div class="form-grid">
                             <div class="field">
-                                <label for="id_ac">Aset AC</label>
-                                <select id="id_ac" name="id_ac" required>
-                                    @foreach ($listBarang as $barang)
-                                        <option value="{{ $barang->id_ac }}" {{ (string) old('id_ac', $editItem->id_ac) === (string) $barang->id_ac ? 'selected' : '' }}>{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
+                                <label for="nama_vendor">Nama Vendor</label>
+                                <input id="nama_vendor" type="text" name="nama_vendor" value="{{ old('nama_vendor', $editItem->nama_vendor) }}" required>
+                            </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" type="email" name="email" value="{{ old('email', $editItem->email) }}">
+                            </div>
+                            <div class="field">
+                                <label for="no_hp">No HP</label>
+                                <input id="no_hp" type="text" name="no_hp" value="{{ old('no_hp', $editItem->no_hp) }}">
+                            </div>
+                            <div class="field">
+                                <label for="id_user">User PIC Internal</label>
+                                <select id="id_user" name="id_user">
+                                    <option value="">-</option>
+                                    @foreach ($listUsers as $user)
+                                        <option value="{{ $user->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $user->id_user ? 'selected' : '' }}>{{ $user->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="field">
-                                <label for="id_user">Teknisi</label>
-                                <select id="id_user" name="id_user" required>
-                                    @foreach ($listTeknisi as $teknisi)
-                                        <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
+                                <label for="pic_nama">PIC Vendor</label>
+                                <input id="pic_nama" type="text" name="pic_nama" value="{{ old('pic_nama', $editItem->pic_nama) }}">
+                            </div>
+                            <div class="field">
+                                <label for="pic_no_hp">No HP PIC</label>
+                                <input id="pic_no_hp" type="text" name="pic_no_hp" value="{{ old('pic_no_hp', $editItem->pic_no_hp) }}">
+                            </div>
+                            <div class="field">
+                                <label for="layanan">Layanan</label>
+                                @php $layananEdit = old('layanan', $editItem->layanan); @endphp
+                                <select id="layanan" name="layanan" required>
+                                    @foreach ($layananOptions as $layanan)
+                                        <option value="{{ $layanan }}" {{ $layananEdit === $layanan ? 'selected' : '' }}>{{ $layanan }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-                            <div class="field">
-                                <label for="tanggal_perbaikan">Tanggal Perbaikan</label>
-                                <input id="tanggal_perbaikan" type="date" name="tanggal_perbaikan" value="{{ old('tanggal_perbaikan', $editItem->tanggal_perbaikan) }}" required>
-                            </div>
-                            <div class="field">
-                                <label for="jenis_perbaikan">Jenis Perbaikan</label>
-                                <input id="jenis_perbaikan" type="text" name="jenis_perbaikan" value="{{ old('jenis_perbaikan', $editItem->jenis_perbaikan) }}" required>
-                            </div>
-                            <div class="field">
-                                <label for="biaya">Biaya</label>
-                                <input id="biaya" type="number" name="biaya" value="{{ old('biaya', $editItem->biaya) }}" min="0" step="0.01">
                             </div>
                             <div class="field">
                                 <label for="status">Status</label>
@@ -131,13 +142,17 @@
                                 </select>
                             </div>
                             <div class="field" style="grid-column: 1 / -1;">
-                                <label for="deskripsi">Deskripsi</label>
-                                <textarea id="deskripsi" name="deskripsi">{{ old('deskripsi', $editItem->deskripsi) }}</textarea>
+                                <label for="alamat">Alamat</label>
+                                <textarea id="alamat" name="alamat">{{ old('alamat', $editItem->alamat) }}</textarea>
+                            </div>
+                            <div class="field" style="grid-column: 1 / -1;">
+                                <label for="catatan">Catatan</label>
+                                <textarea id="catatan" name="catatan">{{ old('catatan', $editItem->catatan) }}</textarea>
                             </div>
                         </div>
                         <div class="actions">
                             <button type="submit" class="btn btn-warning">Update Data</button>
-                            <a href="{{ route('perbaikan.index') }}" class="btn btn-soft">Batal Edit</a>
+                            <a href="{{ route('vendor.index') }}" class="btn btn-soft">Batal Edit</a>
                         </div>
                     </form>
                 @endif
@@ -145,14 +160,14 @@
 
             <div class="panel">
                 <div class="panel-head">
-                    <h1>Daftar Perbaikan</h1>
-                    <button type="button" class="btn btn-primary" onclick="openTambahModal()">Tambah Perbaikan</button>
+                    <h1>Daftar Vendor</h1>
+                    <button type="button" class="btn btn-primary" onclick="openTambahModal()">Tambah Vendor</button>
                 </div>
                 <p class="sub">Total data: {{ $items->count() }}</p>
-                <form method="GET" action="{{ route('perbaikan.index') }}" class="filter-form" id="perbaikanFilterForm">
+                <form method="GET" action="{{ route('vendor.index') }}" class="filter-form" id="vendorFilterForm">
                     <div class="field">
                         <label for="q">Pencarian</label>
-                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Aset, teknisi, jenis, deskripsi">
+                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Nama vendor, PIC, email, layanan">
                     </div>
                     <div class="field">
                         <label for="status_filter">Filter Status</label>
@@ -168,13 +183,12 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Tanggal</th>
-                            <th>Barang</th>
-                            <th>Jenis</th>
-                            <th>Teknisi</th>
-                            <th>Biaya</th>
+                            <th>Nama Vendor</th>
+                            <th>Kontak</th>
+                            <th>PIC</th>
+                            <th>Layanan</th>
                             <th>Status</th>
-                            <th>Deskripsi</th>
+                            <th>User Internal</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -182,17 +196,16 @@
                         @forelse ($items as $row)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $row->tanggal_perbaikan }}</td>
-                                <td>{{ optional($row->barang)->kode_bmn ?? '-' }} - {{ optional($row->barang)->merk ?? '-' }}</td>
-                                <td>{{ $row->jenis_perbaikan }}</td>
-                                <td>{{ optional($row->user)->nama ?? '-' }}</td>
-                                <td>{{ $row->biaya !== null ? number_format((float) $row->biaya, 0, ',', '.') : '-' }}</td>
-                                <td>{{ $row->status ?? '-' }}</td>
-                                <td>{{ $row->deskripsi ?: '-' }}</td>
+                                <td>{{ $row->nama_vendor }}</td>
+                                <td>{{ $row->email ?: '-' }} / {{ $row->no_hp ?: '-' }}</td>
+                                <td>{{ $row->pic_nama ?: '-' }} / {{ $row->pic_no_hp ?: '-' }}</td>
+                                <td>{{ $row->layanan ?: '-' }}</td>
+                                <td>{{ $row->status }}</td>
+                                <td>{{ optional($row->user)->nama ?: '-' }}</td>
                                 <td>
                                     <div class="row-actions">
-                                        <a href="{{ route('perbaikan.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_perbaikan])) }}" class="btn btn-warning">Edit</a>
-                                        <form method="POST" action="{{ route('perbaikan.destroy', $row->id_perbaikan) }}" class="delete-form" data-item="{{ optional($row->barang)->kode_bmn ?? ('ID ' . $row->id_perbaikan) }}">
+                                        <a href="{{ route('vendor.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_vendor])) }}" class="btn btn-warning">Edit</a>
+                                        <form method="POST" action="{{ route('vendor.destroy', $row->id_vendor) }}" class="delete-form" data-item="{{ $row->nama_vendor }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">Hapus</button>
@@ -201,7 +214,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9">Belum ada data.</td></tr>
+                            <tr><td colspan="8">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -209,48 +222,56 @@
         </div>
     </div>
 
-    <div id="tambahPerbaikanModal" class="modal {{ ($errors->any() && !$editItem) ? 'open' : '' }}">
+    <div id="tambahVendorModal" class="modal {{ ($errors->any() && !$editItem) ? 'open' : '' }}">
         <div class="modal-card">
             <div class="modal-head">
-                <h2>Tambah Perbaikan</h2>
+                <h2>Tambah Vendor</h2>
                 <button type="button" class="btn btn-close" onclick="closeTambahModal()">Tutup</button>
             </div>
-            <form method="POST" action="{{ route('perbaikan.insert') }}">
+            <form method="POST" action="{{ route('vendor.insert') }}">
                 @csrf
                 <div class="form-grid">
                     <div class="field">
-                        <label for="add_id_ac">Aset AC</label>
-                        <select id="add_id_ac" name="id_ac" required>
-                            <option value="">Pilih aset</option>
-                            @foreach ($listBarang as $barang)
-                                <option value="{{ $barang->id_ac }}" {{ (string) old('id_ac') === (string) $barang->id_ac ? 'selected' : '' }}>{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
+                        <label for="add_nama_vendor">Nama Vendor</label>
+                        <input id="add_nama_vendor" type="text" name="nama_vendor" value="{{ old('nama_vendor') }}" required>
+                    </div>
+                    <div class="field">
+                        <label for="add_email">Email</label>
+                        <input id="add_email" type="email" name="email" value="{{ old('email') }}">
+                    </div>
+                    <div class="field">
+                        <label for="add_no_hp">No HP</label>
+                        <input id="add_no_hp" type="text" name="no_hp" value="{{ old('no_hp') }}">
+                    </div>
+                    <div class="field">
+                        <label for="add_id_user">User PIC Internal</label>
+                        <select id="add_id_user" name="id_user">
+                            <option value="">-</option>
+                            @foreach ($listUsers as $user)
+                                <option value="{{ $user->id_user }}" {{ (string) old('id_user') === (string) $user->id_user ? 'selected' : '' }}>{{ $user->nama }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="field">
-                        <label for="add_id_user">Teknisi</label>
-                        <select id="add_id_user" name="id_user" required>
-                            <option value="">Pilih teknisi</option>
-                            @foreach ($listTeknisi as $teknisi)
-                                <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user') === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
+                        <label for="add_pic_nama">PIC Vendor</label>
+                        <input id="add_pic_nama" type="text" name="pic_nama" value="{{ old('pic_nama') }}">
+                    </div>
+                    <div class="field">
+                        <label for="add_pic_no_hp">No HP PIC</label>
+                        <input id="add_pic_no_hp" type="text" name="pic_no_hp" value="{{ old('pic_no_hp') }}">
+                    </div>
+                    <div class="field">
+                        <label for="add_layanan">Layanan</label>
+                        @php $layananTambah = old('layanan', 'maintenance'); @endphp
+                        <select id="add_layanan" name="layanan" required>
+                            @foreach ($layananOptions as $layanan)
+                                <option value="{{ $layanan }}" {{ $layananTambah === $layanan ? 'selected' : '' }}>{{ $layanan }}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="field">
-                        <label for="add_tanggal_perbaikan">Tanggal Perbaikan</label>
-                        <input id="add_tanggal_perbaikan" type="date" name="tanggal_perbaikan" value="{{ old('tanggal_perbaikan') }}" required>
-                    </div>
-                    <div class="field">
-                        <label for="add_jenis_perbaikan">Jenis Perbaikan</label>
-                        <input id="add_jenis_perbaikan" type="text" name="jenis_perbaikan" value="{{ old('jenis_perbaikan') }}" required>
-                    </div>
-                    <div class="field">
-                        <label for="add_biaya">Biaya</label>
-                        <input id="add_biaya" type="number" name="biaya" value="{{ old('biaya') }}" min="0" step="0.01">
                     </div>
                     <div class="field">
                         <label for="add_status">Status</label>
-                        @php $statusTambah = old('status', 'baru'); @endphp
+                        @php $statusTambah = old('status', 'aktif'); @endphp
                         <select id="add_status" name="status" required>
                             @foreach ($statusOptions as $statusOption)
                                 <option value="{{ $statusOption }}" {{ $statusTambah === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
@@ -258,8 +279,12 @@
                         </select>
                     </div>
                     <div class="field" style="grid-column: 1 / -1;">
-                        <label for="add_deskripsi">Deskripsi</label>
-                        <textarea id="add_deskripsi" name="deskripsi">{{ old('deskripsi') }}</textarea>
+                        <label for="add_alamat">Alamat</label>
+                        <textarea id="add_alamat" name="alamat">{{ old('alamat') }}</textarea>
+                    </div>
+                    <div class="field" style="grid-column: 1 / -1;">
+                        <label for="add_catatan">Catatan</label>
+                        <textarea id="add_catatan" name="catatan">{{ old('catatan') }}</textarea>
                     </div>
                 </div>
                 <div class="actions">
@@ -287,15 +312,15 @@
         @endif
 
         function openTambahModal() {
-            document.getElementById('tambahPerbaikanModal').classList.add('open');
+            document.getElementById('tambahVendorModal').classList.add('open');
         }
 
         function closeTambahModal() {
-            document.getElementById('tambahPerbaikanModal').classList.remove('open');
+            document.getElementById('tambahVendorModal').classList.remove('open');
         }
 
         (function initAutoFilter() {
-            const form = document.getElementById('perbaikanFilterForm');
+            const form = document.getElementById('vendorFilterForm');
             if (!form) return;
 
             const searchInput = document.getElementById('q');
@@ -326,7 +351,7 @@
                     Swal.fire({
                         ...swalBaseConfig,
                         icon: 'warning',
-                        title: 'Hapus Perbaikan?',
+                        title: 'Hapus Vendor?',
                         text: `Data ${itemName} akan dihapus permanen.`,
                         showCancelButton: true,
                         confirmButtonText: 'Ya, hapus',

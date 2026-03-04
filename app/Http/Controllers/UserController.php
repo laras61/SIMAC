@@ -15,14 +15,29 @@ class UserController extends Controller
      */
     public function index()
     {
-        $items = User::query()->latest('id_user')->get();
+        $search = trim((string) request('q', ''));
+        $role = trim((string) request('role', ''));
+
+        $items = User::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('nama', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%')
+                        ->orWhere('no_hp', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($role !== '', function ($query) use ($role) {
+                $query->where('role', $role);
+            })
+            ->latest('id_user')
+            ->get();
         $editItem = null;
 
         if (request()->filled('edit')) {
             $editItem = User::find(request('edit'));
         }
 
-        return view('user.index', compact('items', 'editItem'));
+        return view('user.index', compact('items', 'editItem', 'search', 'role'));
     }
 
     /**

@@ -16,11 +16,42 @@ class PerbaikanController extends Controller
      */
     public function index()
     {
-        $items = Perbaikan::with(['barang', 'user'])->latest('id_perbaikan')->get();
-        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
-        $listTeknisi = User::where('role', 'teknisi')->select('id_user', 'nama')->get();
+        $search = trim((string) request('q', ''));
+        $status = trim((string) request('status', ''));
 
-        return view('perbaikan.index', compact('items', 'listBarang', 'listTeknisi'));
+        $itemsQuery = Perbaikan::with(['barang', 'user'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('jenis_perbaikan', 'like', '%' . $search . '%')
+                        ->orWhere('deskripsi', 'like', '%' . $search . '%')
+                        ->orWhereHas('barang', function ($barangQuery) use ($search) {
+                            $barangQuery->where('kode_bmn', 'like', '%' . $search . '%')
+                                ->orWhere('merk', 'like', '%' . $search . '%')
+                                ->orWhere('lokasi', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('nama', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when($status !== '', function ($query) use ($status) {
+                $query->where('status', $status);
+            });
+
+        $items = $itemsQuery->latest('id_perbaikan')->get();
+        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
+        $listTeknisi = User::query()
+            ->whereIn('role', ['teknisi', 'staff', 'admin'])
+            ->select('id_user', 'nama')
+            ->orderBy('nama')
+            ->get();
+
+        $editItem = null;
+        if (request()->filled('edit')) {
+            $editItem = Perbaikan::with(['barang', 'user'])->find(request('edit'));
+        }
+
+        return view('perbaikan.index', compact('items', 'listBarang', 'listTeknisi', 'editItem', 'search', 'status'));
     }
 
     /**

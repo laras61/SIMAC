@@ -3,19 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vendor;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class VendorController extends Controller
 {
     public function index()
     {
-        $items = Vendor::query()
-            ->join('users', 'users.id_user', '=', 'tbl_vendor.id_user')
-            ->select('tbl_vendor.*')
+        $search = trim((string) request('q', ''));
+        $status = trim((string) request('status', ''));
+
+        $itemsQuery = Vendor::query()
             ->with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('nama_vendor', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%')
+                        ->orWhere('no_hp', 'like', '%' . $search . '%')
+                        ->orWhere('pic_nama', 'like', '%' . $search . '%')
+                        ->orWhere('pic_no_hp', 'like', '%' . $search . '%')
+                        ->orWhere('layanan', 'like', '%' . $search . '%')
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('nama', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when($status !== '', function ($query) use ($status) {
+                $query->where('status', $status);
+            });
+
+        $items = $itemsQuery
             ->latest('id_vendor')
             ->get();
-        return response()->json($items);
+
+        $listUsers = User::select('id_user', 'nama')->orderBy('nama')->get();
+
+        $editItem = null;
+        if (request()->filled('edit')) {
+            $editItem = Vendor::find(request('edit'));
+        }
+
+        return view('vendor.index', compact('items', 'listUsers', 'editItem', 'search', 'status'));
     }
 
     public function insert(Request $request)
@@ -25,20 +53,17 @@ class VendorController extends Controller
             'email' => 'nullable|string|email|max:255|unique:tbl_vendor,email',
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
-            'id_user' => 'required|exists:users,id_user',
+            'id_user' => 'nullable|exists:users,id_user',
             'pic_nama' => 'nullable|string|max:255',
             'pic_no_hp' => 'nullable|string|max:20',
-            'layanan' => 'nullable|in:perbaikan',
+            'layanan' => 'required|in:maintenance,perbaikan',
             'status' => 'required|in:aktif,nonaktif',
             'catatan' => 'nullable|string',
         ]);
 
-        $vendor = Vendor::create([
-            ...$validated,
-            'layanan' => 'perbaikan',
-        ]);
+        Vendor::create($validated);
 
-        return response()->json($vendor, 201);
+        return redirect()->route('vendor.index')->with('success', 'Data vendor berhasil ditambahkan.');
     }
 
     public function show(Vendor $vendor)
@@ -53,25 +78,23 @@ class VendorController extends Controller
             'email' => 'nullable|string|email|max:255|unique:tbl_vendor,email,' . $vendor->id_vendor . ',id_vendor',
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
-            'id_user' => 'required|exists:users,id_user',
+            'id_user' => 'nullable|exists:users,id_user',
             'pic_nama' => 'nullable|string|max:255',
             'pic_no_hp' => 'nullable|string|max:20',
-            'layanan' => 'nullable|in:perbaikan',
+            'layanan' => 'required|in:maintenance,perbaikan',
             'status' => 'required|in:aktif,nonaktif',
             'catatan' => 'nullable|string',
         ]);
 
-        $vendor->update([
-            ...$validated,
-            'layanan' => 'perbaikan',
-        ]);
+        $vendor->update($validated);
 
-        return $vendor;
+        return redirect()->route('vendor.index')->with('success', 'Data vendor berhasil diperbarui.');
     }
 
     public function destroy(Vendor $vendor)
     {
         $vendor->delete();
-        return response()->json(['message' => 'Vendor berhasil dihapus.']);
+
+        return redirect()->route('vendor.index')->with('success', 'Data vendor berhasil dihapus.');
     }
 }

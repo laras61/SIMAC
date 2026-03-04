@@ -18,6 +18,7 @@ class Vendor extends Model
         'no_hp',
         'alamat',
         'id_user',
+        'pic_nama',
         'pic_no_hp',
         'layanan',
         'status',

@@ -7,27 +7,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #fff7ed;
+            --bg: #f8fafc;
             --surface: #ffffff;
-            --text: #431407;
-            --muted: #9a3412;
-            --line: #fed7aa;
-            --primary: #ea580c;
-            --primary-dark: #c2410c;
+            --text: #1f2937;
+            --muted: #0f172a;
+            --line: #e2e8f0;
+            --primary: #0f766e;
+            --primary-dark: #115e59;
             --danger: #b91c1c;
-            --cream-soft: #ffedd5;
+            --cream-soft: #e2e8f0;
         }
         * { box-sizing: border-box; }
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            background: radial-gradient(circle at top right, #ffedd5 0%, var(--bg) 45%, #ffffff 100%);
+            background: var(--bg);
             color: var(--text);
         }
         .wrap { width: min(1100px, calc(100% - 28px)); margin: 18px auto 32px; }
         .stack { display: grid; gap: 12px; }
         .page-head { padding: 2px 2px 6px; }
-        .panel { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 12px; padding: 14px; box-shadow: 0 12px 26px rgba(194,65,12,.08); overflow-x: auto; }
+        .panel { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 12px; padding: 14px; box-shadow: 0 12px 26px rgba(15,23,42,.06); overflow-x: auto; }
         h1 { margin: 0 0 4px; font-size: 24px; color: var(--primary-dark); }
         .sub { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
         .form-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 10px; }
@@ -60,7 +60,7 @@
             justify-content: center;
         }
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-warning { background: #475569; color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-soft { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
         .btn-close { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
@@ -86,7 +86,7 @@
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(67, 20, 7, 0.35);
+            background: rgba(15, 23, 42, 0.35);
             display: none;
             align-items: center;
             justify-content: center;
@@ -104,7 +104,7 @@
             border-top: 3px solid var(--primary);
             border-radius: 12px;
             padding: 14px;
-            box-shadow: 0 12px 26px rgba(194,65,12,.18);
+            box-shadow: 0 12px 26px rgba(15,23,42,.12);
         }
         .modal-head {
             display: flex;
@@ -333,7 +333,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const swalBaseConfig = {
-            confirmButtonColor: '#ea580c'
+            confirmButtonColor: '#0f766e'
         };
 
         @if (session('success'))
@@ -415,7 +415,7 @@
                         showCancelButton: true,
                         confirmButtonText: 'Ya, hapus',
                         cancelButtonText: 'Batal',
-                        cancelButtonColor: '#9a3412'
+                        cancelButtonColor: '#0f172a'
                     }).then(function (result) {
                         if (result.isConfirmed) {
                             form.submit();
@@ -427,3 +427,5 @@
     </script>
 </body>
 </html>
+
+
