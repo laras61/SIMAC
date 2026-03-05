@@ -44,7 +44,7 @@ class MaintenanceController extends Controller
 
         $items = $itemsQuery->latest('id_maintenance')->get();
         $listPic = User::query()
-            ->where('role', 'pic')
+            ->where('role', 'staff')
             ->select('id_user', 'nama')
             ->orderBy('nama')
             ->get();
@@ -85,7 +85,7 @@ class MaintenanceController extends Controller
             'id_user' => [
                 'required',
                 Rule::exists('users', 'id_user')->where(function ($query) {
-                    $query->where('role', 'pic');
+                    $query->where('role', 'staff');
                 }),
             ],
             'tanggal_dikerjakan' => 'nullable|date',
