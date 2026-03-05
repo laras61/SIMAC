@@ -42,7 +42,12 @@ class MaintenanceController extends Controller
                 $query->where('status', $status);
             });
 
-        $items = $itemsQuery->latest('id_maintenance')->get();
+        $items = $itemsQuery
+            ->orderByRaw("CASE WHEN status IN ('pending', 'proses') THEN 0 ELSE 1 END")
+            ->orderByRaw('ABS(DATEDIFF(tanggal_jadwal, CURDATE())) ASC')
+            ->orderBy('tanggal_jadwal')
+            ->orderByDesc('id_maintenance')
+            ->get();
         $listPic = User::query()
             ->where('role', 'staff')
             ->select('id_user', 'nama')
