@@ -130,7 +130,7 @@
 <body>
     @include('partials.nav')
     @php
-        $roleOptions = ['admin', 'staff'];
+        $roleOptions = ['admin', 'staff', 'pic'];
     @endphp
     <div class="wrap">
         <div class="stack">

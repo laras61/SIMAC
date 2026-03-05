@@ -49,8 +49,7 @@ class DashboardController extends Controller
                 'aset' => $barang->kode_bmn . ' / ' . $barang->lokasi,
                 'last_date' => $lastDate->format('Y-m-d'),
                 'next_due' => $nextDue->format('Y-m-d'),
-                'teknisi' => $lastMaintenance?->user?->nama ?? '-',
-                'pic' => '-',
+                'pic' => $lastMaintenance?->user?->nama ?? '-',
                 'status' => $statusDue,
             ];
         })
@@ -88,7 +87,7 @@ class DashboardController extends Controller
 
     public function teknisi()
     {
-        if (Auth::user()->role !== 'staff') {
+        if (! in_array(Auth::user()->role, ['staff', 'pic'], true)) {
             return redirect()->route('dashboard');
         }
         

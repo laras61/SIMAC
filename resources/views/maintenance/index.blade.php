@@ -59,7 +59,6 @@
         .btn-warning { background: #475569; color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-soft { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
-        .btn-close { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--cream-soft); white-space: nowrap; }
         th { color: var(--muted); background: var(--bg); }
@@ -67,14 +66,17 @@
         .row-actions form { margin: 0; }
         .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
         .filter-form { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px); gap: 8px; margin-bottom: 10px; align-items: end; }
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
-        .modal.open { display: flex; }
-        .modal-card { width: min(980px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; overflow-x: hidden; background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 12px; padding: 14px; box-shadow: 0 12px 26px rgba(15,23,42,.12); }
-        .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-        .modal-head h2 { margin: 0; font-size: 18px; color: var(--primary-dark); }
-        .modal .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .badge {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge.pending { color: #92400e; background: #fef3c7; }
+        .badge.proses { color: #1d4ed8; background: #dbeafe; }
+        .badge.selesai { color: #166534; background: #dcfce7; }
         @media (max-width: 900px) { .form-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); } }
-        @media (max-width: 900px) { .modal .form-grid { grid-template-columns: 1fr; } }
         @media (max-width: 760px) { .filter-form { grid-template-columns: 1fr; } }
         @media (max-width: 760px) { .panel-head { flex-direction: column; align-items: stretch; } }
         @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
@@ -83,8 +85,8 @@
 <body>
     @include('partials.nav')
     @php
-        $statusOptions = ['pending', 'selesai'];
-        $jenisOptions = ['preventive', 'corrective'];
+        $statusOptions = ['pending', 'proses', 'selesai'];
+        $statusUpdateOptions = ['proses', 'selesai'];
     @endphp
     <div class="wrap">
         <div class="stack">
@@ -95,44 +97,33 @@
                         @method('PATCH')
                         <div class="form-grid">
                             <div class="field">
-                                <label for="id_ac">Aset AC</label>
-                                <select id="id_ac" name="id_ac" required>
-                                    @foreach ($listBarang as $barang)
-                                        <option value="{{ $barang->id_ac }}" {{ (string) old('id_ac', $editItem->id_ac) === (string) $barang->id_ac ? 'selected' : '' }}>{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
-                                    @endforeach
-                                </select>
+                                <label>Aset AC</label>
+                                <input type="text" value="{{ optional($editItem->barang)->kode_bmn ?? '-' }} - {{ optional($editItem->barang)->merk ?? '-' }} ({{ optional($editItem->barang)->lokasi ?? '-' }})" readonly>
                             </div>
                             <div class="field">
-                                <label for="id_user">Teknisi</label>
+                                <label>Tanggal Jadwal</label>
+                                <input type="date" value="{{ $editItem->tanggal_jadwal }}" readonly>
+                            </div>
+                            <div class="field">
+                                <label for="id_user">PIC</label>
                                 <select id="id_user" name="id_user" required>
-                                    @foreach ($listTeknisi as $teknisi)
-                                        <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="field">
-                                <label for="tanggal_jadwal">Tanggal Jadwal</label>
-                                <input id="tanggal_jadwal" type="date" name="tanggal_jadwal" value="{{ old('tanggal_jadwal', $editItem->tanggal_jadwal) }}" required>
-                            </div>
-                            <div class="field">
-                                <label for="tanggal_dikerjakan">Tanggal Dikerjakan</label>
-                                <input id="tanggal_dikerjakan" type="date" name="tanggal_dikerjakan" value="{{ old('tanggal_dikerjakan', $editItem->tanggal_dikerjakan) }}">
-                            </div>
-                            <div class="field">
-                                <label for="jenis">Jenis</label>
-                                <select id="jenis" name="jenis" required>
-                                    @foreach ($jenisOptions as $jenis)
-                                        <option value="{{ $jenis }}" {{ old('jenis', $editItem->jenis) === $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                                    <option value="">Pilih PIC</option>
+                                    @foreach ($listPic as $pic)
+                                        <option value="{{ $pic->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $pic->id_user ? 'selected' : '' }}>{{ $pic->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="field">
                                 <label for="status">Status</label>
                                 <select id="status" name="status" required>
-                                    @foreach ($statusOptions as $statusOption)
+                                    @foreach ($statusUpdateOptions as $statusOption)
                                         <option value="{{ $statusOption }}" {{ old('status', $editItem->status) === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="field">
+                                <label for="tanggal_dikerjakan">Tanggal Dikerjakan</label>
+                                <input id="tanggal_dikerjakan" type="date" name="tanggal_dikerjakan" value="{{ old('tanggal_dikerjakan', $editItem->tanggal_dikerjakan) }}">
                             </div>
                             <div class="field" style="grid-column: 1 / -1;">
                                 <label for="catatan">Catatan</label>
@@ -140,7 +131,7 @@
                             </div>
                         </div>
                         <div class="actions">
-                            <button type="submit" class="btn btn-warning">Update Data</button>
+                            <button type="submit" class="btn btn-warning">Update Maintenance</button>
                             <a href="{{ route('maintenance.index') }}" class="btn btn-soft">Batal Edit</a>
                         </div>
                     </form>
@@ -149,14 +140,13 @@
 
             <div class="panel">
                 <div class="panel-head">
-                    <h1>Daftar Maintenance</h1>
-                    <button type="button" class="btn btn-primary" onclick="openTambahModal()">Tambah Maintenance</button>
+                    <h1>Daftar Maintenance Otomatis</h1>
                 </div>
-                <p class="sub">Total data: {{ $items->count() }}</p>
+                <p class="sub">Jadwal maintenance dibuat otomatis dari data barang setiap 6 bulan.</p>
                 <form method="GET" action="{{ route('maintenance.index') }}" class="filter-form" id="maintenanceFilterForm">
                     <div class="field">
                         <label for="q">Pencarian</label>
-                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Aset, teknisi, jenis, status">
+                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Aset, PIC, jenis, status">
                     </div>
                     <div class="field">
                         <label for="status_filter">Filter Status</label>
@@ -175,7 +165,7 @@
                             <th>Tanggal Jadwal</th>
                             <th>Tanggal Dikerjakan</th>
                             <th>Barang</th>
-                            <th>Teknisi</th>
+                            <th>PIC</th>
                             <th>Jenis</th>
                             <th>Status</th>
                             <th>Catatan</th>
@@ -191,11 +181,11 @@
                                 <td>{{ optional($row->barang)->kode_bmn ?? '-' }} - {{ optional($row->barang)->merk ?? '-' }}</td>
                                 <td>{{ optional($row->user)->nama ?? '-' }}</td>
                                 <td>{{ $row->jenis }}</td>
-                                <td>{{ $row->status }}</td>
+                                <td><span class="badge {{ $row->status }}">{{ $row->status }}</span></td>
                                 <td>{{ $row->catatan ?: '-' }}</td>
                                 <td>
                                     <div class="row-actions">
-                                        <a href="{{ route('maintenance.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_maintenance])) }}" class="btn btn-warning">Edit</a>
+                                        <a href="{{ route('maintenance.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_maintenance])) }}" class="btn btn-warning">Update</a>
                                         <form method="POST" action="{{ route('maintenance.destroy', $row->id_maintenance) }}" class="delete-form" data-item="{{ optional($row->barang)->kode_bmn ?? ('ID ' . $row->id_maintenance) }}">
                                             @csrf
                                             @method('DELETE')
@@ -210,72 +200,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-
-    <div id="tambahMaintenanceModal" class="modal {{ ($errors->any() && !$editItem) ? 'open' : '' }}">
-        <div class="modal-card">
-            <div class="modal-head">
-                <h2>Tambah Maintenance</h2>
-                <button type="button" class="btn btn-close" onclick="closeTambahModal()">Tutup</button>
-            </div>
-            <form method="POST" action="{{ route('maintenance.insert') }}">
-                @csrf
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="add_id_ac">Aset AC</label>
-                        <select id="add_id_ac" name="id_ac" required>
-                            <option value="">Pilih aset</option>
-                            @foreach ($listBarang as $barang)
-                                <option value="{{ $barang->id_ac }}" {{ (string) old('id_ac') === (string) $barang->id_ac ? 'selected' : '' }}>{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="add_id_user">Teknisi</label>
-                        <select id="add_id_user" name="id_user" required>
-                            <option value="">Pilih teknisi</option>
-                            @foreach ($listTeknisi as $teknisi)
-                                <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user') === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="add_tanggal_jadwal">Tanggal Jadwal</label>
-                        <input id="add_tanggal_jadwal" type="date" name="tanggal_jadwal" value="{{ old('tanggal_jadwal') }}" required>
-                    </div>
-                    <div class="field">
-                        <label for="add_tanggal_dikerjakan">Tanggal Dikerjakan</label>
-                        <input id="add_tanggal_dikerjakan" type="date" name="tanggal_dikerjakan" value="{{ old('tanggal_dikerjakan') }}">
-                    </div>
-                    <div class="field">
-                        <label for="add_jenis">Jenis</label>
-                        @php $jenisTambah = old('jenis', 'preventive'); @endphp
-                        <select id="add_jenis" name="jenis" required>
-                            @foreach ($jenisOptions as $jenis)
-                                <option value="{{ $jenis }}" {{ $jenisTambah === $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="add_status">Status</label>
-                        @php $statusTambah = old('status', 'pending'); @endphp
-                        <select id="add_status" name="status" required>
-                            @foreach ($statusOptions as $statusOption)
-                                <option value="{{ $statusOption }}" {{ $statusTambah === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="field" style="grid-column: 1 / -1;">
-                        <label for="add_catatan">Catatan</label>
-                        <textarea id="add_catatan" name="catatan">{{ old('catatan') }}</textarea>
-                    </div>
-                </div>
-                <div class="actions">
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-close" onclick="closeTambahModal()">Batal</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -294,14 +218,6 @@
         @if ($errors->any())
             Swal.fire({ ...swalBaseConfig, icon: 'warning', title: 'Validasi', text: @json($errors->first()) });
         @endif
-
-        function openTambahModal() {
-            document.getElementById('tambahMaintenanceModal').classList.add('open');
-        }
-
-        function closeTambahModal() {
-            document.getElementById('tambahMaintenanceModal').classList.remove('open');
-        }
 
         (function initAutoFilter() {
             const form = document.getElementById('maintenanceFilterForm');

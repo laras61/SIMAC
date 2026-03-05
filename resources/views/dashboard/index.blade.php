@@ -57,7 +57,7 @@
         }
         .stats .card:nth-child(1) { background: linear-gradient(180deg, #e2e8f0, #ffffff); }
         .stats .card:nth-child(2) { background: linear-gradient(180deg, #fee2e2, #ffffff); }
-        .stats .card:nth-child(3) { background: linear-gradient(180deg, #e2e8f0, #ffffff); }
+        .stats .card:nth-child(3) { background: linear-gradient(180deg, #fef3c7, #ffffff); }
         .stats .card:nth-child(4) { background: linear-gradient(180deg, #f8fafc, #ffffff); }
         .card .label { color: var(--muted); font-size: 12px; }
         .card .value { margin-top: 6px; font-size: 22px; font-weight: 700; color: var(--primary-dark); }
@@ -128,7 +128,7 @@
             font-weight: 600;
         }
         .ok { color: var(--ok); background: #dcfce7; }
-        .warn { color: #334155; background: #e2e8f0; }
+        .warn { color: #92400e; background: #fef3c7; }
         .danger { color: var(--danger); background: #fee2e2; }
 
         .panel:nth-of-type(1) { border-top-color: #0f766e; }
@@ -169,7 +169,6 @@
                     <tr>
                         <th>Aset</th>
                         <th>Next Due</th>
-                        <th>Teknisi</th>
                         <th>PIC</th>
                         <th>Status</th>
                     </tr>
@@ -179,7 +178,6 @@
                         <tr>
                             <td>{{ $row['aset'] }}</td>
                             <td>{{ $row['next_due'] }}</td>
-                            <td>{{ $row['teknisi'] }}</td>
                             <td>{{ $row['pic'] }}</td>
                             <td>
                                 @if ($row['status'] === 'Terjadwal')

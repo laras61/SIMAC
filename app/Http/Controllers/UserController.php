@@ -51,7 +51,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'no_hp' => 'nullable|string|max:15',
-            'role' => ['nullable', Rule::in(['admin', 'staff'])],
+            'role' => ['nullable', Rule::in(['admin', 'staff', 'pic'])],
         ]);
 
         User::create([
@@ -84,7 +84,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
             'password' => 'nullable|string|min:8', // Password opsional saat update
             'no_hp' => 'nullable|string|max:15',
-            'role' => ['nullable', Rule::in(['admin', 'staff'])],
+            'role' => ['nullable', Rule::in(['admin', 'staff', 'pic'])],
         ]);
 
         $data = [

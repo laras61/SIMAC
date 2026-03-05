@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Maintenance;
 use App\Models\Barang;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MaintenanceController extends Controller
 {
@@ -15,6 +17,9 @@ class MaintenanceController extends Controller
      */
     public function index()
     {
+        $this->syncPreventiveMaintenanceSchedules();
+        $this->promoteDueMaintenanceToProses();
+
         $search = trim((string) request('q', ''));
         $status = trim((string) request('status', ''));
 
@@ -38,9 +43,8 @@ class MaintenanceController extends Controller
             });
 
         $items = $itemsQuery->latest('id_maintenance')->get();
-        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
-        $listTeknisi = User::query()
-            ->whereIn('role', ['teknisi', 'staff', 'admin'])
+        $listPic = User::query()
+            ->where('role', 'pic')
             ->select('id_user', 'nama')
             ->orderBy('nama')
             ->get();
@@ -50,7 +54,7 @@ class MaintenanceController extends Controller
             $editItem = Maintenance::with(['barang', 'user'])->find(request('edit'));
         }
 
-        return view('maintenance.index', compact('items', 'listBarang', 'listTeknisi', 'editItem', 'search', 'status'));
+        return view('maintenance.index', compact('items', 'listPic', 'editItem', 'search', 'status'));
     }
 
     /**
@@ -58,19 +62,9 @@ class MaintenanceController extends Controller
      */
     public function insert(Request $request)
     {
-        $validated = $request->validate([
-            'id_ac' => 'required|exists:tbl_barang,id_ac',
-            'id_user' => 'required|exists:users,id_user',
-            'tanggal_jadwal' => 'required|date',
-            'tanggal_dikerjakan' => 'nullable|date',
-            'jenis' => 'required|in:preventive,corrective',
-            'catatan' => 'nullable|string',
-            'status' => 'required|in:pending,selesai',
-        ]);
-
-        Maintenance::create($validated);
-
-        return redirect()->route('maintenance.index')->with('success', 'Jadwal maintenance berhasil ditambahkan.');
+        return redirect()
+            ->route('maintenance.index')
+            ->with('error', 'Tambah maintenance manual dinonaktifkan. Jadwal dibuat otomatis dari data barang.');
     }
 
     /**
@@ -88,14 +82,24 @@ class MaintenanceController extends Controller
     public function update(Request $request, Maintenance $maintenance)
     {
         $validated = $request->validate([
-            'id_ac' => 'required|exists:tbl_barang,id_ac',
-            'id_user' => 'required|exists:users,id_user',
-            'tanggal_jadwal' => 'required|date',
+            'id_user' => [
+                'required',
+                Rule::exists('users', 'id_user')->where(function ($query) {
+                    $query->where('role', 'pic');
+                }),
+            ],
             'tanggal_dikerjakan' => 'nullable|date',
-            'jenis' => 'required|in:preventive,corrective',
             'catatan' => 'nullable|string',
-            'status' => 'required|in:pending,selesai',
+            'status' => 'required|in:proses,selesai',
         ]);
+
+        if ($validated['status'] === 'selesai' && empty($validated['tanggal_dikerjakan'])) {
+            $validated['tanggal_dikerjakan'] = Carbon::today()->format('Y-m-d');
+        }
+
+        if ($validated['status'] === 'proses') {
+            $validated['tanggal_dikerjakan'] = null;
+        }
 
         $maintenance->update($validated);
 
@@ -111,5 +115,53 @@ class MaintenanceController extends Controller
         $maintenance->delete();
 
         return redirect()->route('maintenance.index')->with('success', 'Data maintenance berhasil dihapus.');
+    }
+
+    private function syncPreventiveMaintenanceSchedules(): void
+    {
+        $latestCompletedByAc = Maintenance::query()
+            ->where('jenis', 'preventive')
+            ->where('status', 'selesai')
+            ->whereNotNull('tanggal_dikerjakan')
+            ->orderByDesc('tanggal_dikerjakan')
+            ->orderByDesc('id_maintenance')
+            ->get()
+            ->unique('id_ac')
+            ->keyBy('id_ac');
+
+        $barangs = Barang::query()->select('id_ac', 'tgl_instalasi')->get();
+        foreach ($barangs as $barang) {
+            $lastCompleted = $latestCompletedByAc->get($barang->id_ac);
+            $baseDate = $lastCompleted?->tanggal_dikerjakan ?: $barang->tgl_instalasi;
+            $nextSchedule = Carbon::parse($baseDate)->addMonthsNoOverflow(6)->format('Y-m-d');
+
+            $exists = Maintenance::query()
+                ->where('id_ac', $barang->id_ac)
+                ->where('jenis', 'preventive')
+                ->whereDate('tanggal_jadwal', $nextSchedule)
+                ->exists();
+
+            if (! $exists) {
+                Maintenance::create([
+                    'id_ac' => $barang->id_ac,
+                    'id_user' => null,
+                    'tanggal_jadwal' => $nextSchedule,
+                    'tanggal_dikerjakan' => null,
+                    'jenis' => 'preventive',
+                    'catatan' => null,
+                    'status' => 'pending',
+                ]);
+            }
+        }
+    }
+
+    private function promoteDueMaintenanceToProses(): void
+    {
+        Maintenance::query()
+            ->where('jenis', 'preventive')
+            ->where('status', 'pending')
+            ->whereDate('tanggal_jadwal', '<=', Carbon::today())
+            ->whereNull('tanggal_dikerjakan')
+            ->update(['status' => 'proses']);
     }
 }
