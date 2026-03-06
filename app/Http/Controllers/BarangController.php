@@ -13,6 +13,13 @@ class BarangController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
+        // Jika staff/pic, arahkan ke view khusus staff (read-only)
+        if (in_array($user->role, ['staff', 'pic'])) {
+            return $this->staffIndex();
+        }
+
         $query = Barang::query();
         $search = trim((string) request('q', ''));
         $status = trim((string) request('status', ''));
@@ -41,11 +48,40 @@ class BarangController extends Controller
         return view('barang.index', compact('items', 'editItem', 'search', 'status'));
     }
 
+    private function staffIndex()
+    {
+        $query = Barang::query();
+        $search = trim((string) request('q', ''));
+        $status = trim((string) request('status', ''));
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_bmn', 'like', '%' . $search . '%')
+                    ->orWhere('merk', 'like', '%' . $search . '%')
+                    ->orWhere('serial_number', 'like', '%' . $search . '%')
+                    ->orWhere('tipe_ac', 'like', '%' . $search . '%')
+                    ->orWhere('lokasi', 'like', '%' . $search . '%');
+            });
+        }
+
+        if (in_array($status, ['aktif', 'rusak', 'nonaktif'], true)) {
+            $query->where('status', $status);
+        }
+
+        $items = $query->latest('id_ac')->get();
+        return view('barang.staff_index', compact('items', 'search', 'status'));
+    }
+
     /**
      * Insert a newly created resource in storage.
      */
     public function insert(Request $request)
     {
+        $user = auth()->user();
+        if (in_array($user->role, ['staff', 'pic'])) {
+            return redirect()->route('barang.index')->with('error', 'Anda tidak memiliki akses untuk menambah barang.');
+        }
+
         $validated = $request->validate([
             'kode_bmn' => 'required|string|unique:tbl_barang,kode_bmn',
             'merk' => 'required|string',
@@ -53,7 +89,7 @@ class BarangController extends Controller
             'tipe_ac' => 'required|string',
             'tgl_beli' => 'required|date',
             'tgl_instalasi' => 'required|date',
-            'lokasi' => 'required|in:LAB A,LAB B,LAB,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
+            'lokasi' => 'required|in:LAB A,LAB B,LAB C,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
             'status' => 'required|in:aktif,rusak,nonaktif',
         ]);
 
@@ -84,7 +120,7 @@ class BarangController extends Controller
             'tipe_ac' => 'required|string',
             'tgl_beli' => 'required|date',
             'tgl_instalasi' => 'required|date',
-            'lokasi' => 'required|in:LAB A,LAB B,LAB,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
+            'lokasi' => 'required|in:LAB A,LAB B,LAB C,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
             'status' => 'required|in:aktif,rusak,nonaktif',
         ]);
 

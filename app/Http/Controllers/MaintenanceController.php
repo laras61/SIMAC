@@ -17,6 +17,13 @@ class MaintenanceController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
+        // Jika staff/pic, arahkan ke view khusus staff
+        if (in_array($user->role, ['staff', 'pic'])) {
+            return $this->staffIndex();
+        }
+
         $this->syncPreventiveMaintenanceSchedules();
         $this->promoteDueMaintenanceToProses();
 
@@ -42,7 +49,12 @@ class MaintenanceController extends Controller
                 $query->where('status', $status);
             });
 
-        $items = $itemsQuery->latest('id_maintenance')->get();
+        $items = $itemsQuery
+            ->orderByRaw("CASE WHEN status IN ('pending', 'proses') THEN 0 ELSE 1 END")
+            ->orderByRaw('ABS(DATEDIFF(tanggal_jadwal, CURDATE())) ASC')
+            ->orderBy('tanggal_jadwal')
+            ->orderByDesc('id_maintenance')
+            ->get();
         $listPic = User::query()
             ->where('role', 'staff')
             ->select('id_user', 'nama')
@@ -55,6 +67,17 @@ class MaintenanceController extends Controller
         }
 
         return view('maintenance.index', compact('items', 'listPic', 'editItem', 'search', 'status'));
+    }
+
+    private function staffIndex()
+    {
+        $userId = auth()->id();
+        $items = Maintenance::with(['barang'])
+            ->where('id_user', $userId)
+            ->orderBy('tanggal_jadwal', 'asc')
+            ->get();
+            
+        return view('maintenance.staff_index', compact('items'));
     }
 
     /**
@@ -81,11 +104,37 @@ class MaintenanceController extends Controller
      */
     public function update(Request $request, Maintenance $maintenance)
     {
+        $user = auth()->user();
+
+        // Validasi khusus untuk Staff/PIC
+        if (in_array($user->role, ['staff', 'pic'])) {
+            // Pastikan maintenance ini milik user yang login
+            if ($maintenance->id_user !== $user->id_user) {
+                abort(403, 'Unauthorized');
+            }
+
+            $validated = $request->validate([
+                'status' => 'required|in:proses,selesai',
+                'catatan' => 'nullable|string',
+                'tanggal_dikerjakan' => 'nullable|date',
+            ]);
+
+            // Jika status selesai tapi tanggal kosong, isi hari ini
+            if ($validated['status'] === 'selesai' && empty($validated['tanggal_dikerjakan'])) {
+                $validated['tanggal_dikerjakan'] = Carbon::today()->format('Y-m-d');
+            }
+            
+            $maintenance->update($validated);
+            
+            return redirect()->route('maintenance.index')->with('success', 'Status maintenance berhasil diperbarui.');
+        }
+
+        // Validasi untuk Admin (bisa assign user)
         $validated = $request->validate([
             'id_user' => [
                 'required',
                 Rule::exists('users', 'id_user')->where(function ($query) {
-                    $query->where('role', 'staff');
+                    $query->whereIn('role', ['staff', 'pic']);
                 }),
             ],
             'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',

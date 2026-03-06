@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return Auth::user()->role === 'admin'
-            ? redirect()->route('dashboard')
-            : redirect()->route('teknisi.dashboard');
+        if (Auth::user()->role === 'admin') return redirect()->route('dashboard');
+        return redirect()->route('staff.dashboard');
     }
     return redirect()->route('login');
 });
@@ -32,6 +31,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/teknisi-dashboard', [DashboardController::class, 'teknisi'])
     ->middleware('auth')
     ->name('teknisi.dashboard');
+
+Route::get('/staff-dashboard', [DashboardController::class, 'staff'])
+    ->middleware('auth')
+    ->name('staff.dashboard');
 Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
 Route::post('/barang/insert', [BarangController::class, 'insert'])->name('barang.insert');
 Route::get('/barang/{barang}', [BarangController::class, 'show'])->name('barang.show');

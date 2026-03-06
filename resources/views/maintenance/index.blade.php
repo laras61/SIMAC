@@ -57,7 +57,6 @@
         }
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-warning { background: #475569; color: #fff; }
-        .btn-danger { background: var(--danger); color: #fff; }
         .btn-soft { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--cream-soft); white-space: nowrap; }
@@ -186,11 +185,6 @@
                                 <td>
                                     <div class="row-actions">
                                         <a href="{{ route('maintenance.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_maintenance])) }}" class="btn btn-warning">Update</a>
-                                        <form method="POST" action="{{ route('maintenance.destroy', $row->id_maintenance) }}" class="delete-form" data-item="{{ optional($row->barang)->kode_bmn ?? ('ID ' . $row->id_maintenance) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Hapus</button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -239,30 +233,6 @@
             }
         })();
 
-        (function initDeleteConfirmation() {
-            const forms = document.querySelectorAll('.delete-form');
-            if (!forms.length) return;
-
-            forms.forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    event.preventDefault();
-                    const itemName = form.dataset.item || 'data ini';
-
-                    Swal.fire({
-                        ...swalBaseConfig,
-                        icon: 'warning',
-                        title: 'Hapus Maintenance?',
-                        text: `Data ${itemName} akan dihapus permanen.`,
-                        showCancelButton: true,
-                        confirmButtonText: 'Ya, hapus',
-                        cancelButtonText: 'Batal',
-                        cancelButtonColor: '#0f172a'
-                    }).then(function (result) {
-                        if (result.isConfirmed) form.submit();
-                    });
-                });
-            });
-        })();
     </script>
 </body>
 </html>
