@@ -17,12 +17,12 @@
         } 
     </style>
 </head>
-<body class="bg-white min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all hover:shadow-xl hover:scale-[1.01] duration-300 ring-1 ring-orange-50">
-        <div class="bg-gradient-to-r from-orange-400 to-amber-400 p-8 text-center relative overflow-hidden group">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl shadow-teal-900/20 overflow-hidden transform transition-all hover:shadow-teal-900/30 hover:scale-[1.01] duration-300 ring-1 ring-teal-50">
+        <div class="bg-gradient-to-r from-teal-600 to-teal-700 p-8 text-center relative overflow-hidden group">
             <div class="absolute top-0 left-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
             <h2 class="text-3xl font-extrabold text-white tracking-wide relative z-10 drop-shadow-sm">SIMAC</h2>
-            <p class="text-orange-50 mt-2 text-sm font-medium tracking-wider uppercase relative z-10">Sistem Manajemen AC</p>
+            <p class="text-teal-50 mt-2 text-sm font-medium tracking-wider uppercase relative z-10">Sistem Manajemen AC</p>
             
             <!-- Decorative circles -->
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-white opacity-10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-700"></div>
@@ -32,31 +32,31 @@
         <div class="p-8">
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
                 <div>
-                    <label for="login_id" class="block text-sm font-semibold text-orange-600 mb-1 transition-all duration-300 group-focus-within:text-orange-800 group-focus-within:translate-x-1">Email atau Username</label>
+                    <label for="login_id" class="block text-sm font-semibold text-teal-700 mb-1 transition-all duration-300 group-focus-within:text-teal-900 group-focus-within:translate-x-1">Email atau Username</label>
                     <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-teal-600 transition-colors duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                         </div>
                         <input type="text" id="login_id" name="login_id" required 
-                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 focus:outline-none transition duration-200 ease-in-out sm:text-sm bg-gray-50 focus:bg-white placeholder-gray-400"
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-teal-600 focus:border-teal-600 focus:outline-none transition duration-200 ease-in-out sm:text-sm bg-gray-50 focus:bg-white placeholder-gray-400"
                             placeholder="Masukkan email atau username">
                     </div>
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-orange-600 mb-1 transition-all duration-300 group-focus-within:text-orange-800 group-focus-within:translate-x-1">Password</label>
+                    <label for="password" class="block text-sm font-semibold text-teal-700 mb-1 transition-all duration-300 group-focus-within:text-teal-900 group-focus-within:translate-x-1">Password</label>
                     <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-teal-600 transition-colors duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                         </div>
                         <input type="password" id="password" name="password" required 
-                            class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-orange-500 focus:outline-none transition duration-200 ease-in-out sm:text-sm bg-gray-50 focus:bg-white placeholder-gray-400"
+                            class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-teal-600 focus:border-teal-600 focus:outline-none transition duration-200 ease-in-out sm:text-sm bg-gray-50 focus:bg-white placeholder-gray-400"
                             placeholder="Masukkan password">
-                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 focus:outline-none transition-colors duration-200">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-teal-700 focus:outline-none transition-colors duration-200">
                             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -71,13 +71,13 @@
                 <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm hidden rounded-r animate-pulse"></div>
 
                 <button type="submit" 
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg active:scale-95">
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg active:scale-95">
                     Sign in
                 </button>
             </form>
         </div>
-        <div class="bg-orange-50 px-8 py-4 border-t border-orange-100">
-            <p class="text-xs text-center text-orange-600/70 font-medium">&copy; {{ date('Y') }} SIMAC. All rights reserved.</p>
+        <div class="bg-teal-50 px-8 py-4 border-t border-teal-100">
+            <p class="text-xs text-center text-teal-700/70 font-medium">&copy; {{ date('Y') }} SIMAC. All rights reserved.</p>
         </div>
     </div>
 
