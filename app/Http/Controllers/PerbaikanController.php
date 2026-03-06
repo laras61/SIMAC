@@ -91,6 +91,7 @@ class PerbaikanController extends Controller
             'jenis_perbaikan' => 'required|string',
             'deskripsi' => 'nullable|string',
             'id_user' => 'required|exists:users,id_user',
+            'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'biaya' => 'nullable|numeric',
             'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
         ]);
@@ -102,6 +103,7 @@ class PerbaikanController extends Controller
             'jenis_perbaikan' => $validated['jenis_perbaikan'],
             'deskripsi' => $validated['deskripsi'] ?? null,
             'id_user' => $validated['id_user'],
+            'id_vendor' => $validated['id_vendor'] ?? null,
             'biaya' => $validated['biaya'] ?? null,
             'status' => $validated['status'] ?? 'baru',
         ]);
@@ -150,6 +152,7 @@ class PerbaikanController extends Controller
             'jenis_perbaikan' => 'required|string',
             'deskripsi' => 'nullable|string',
             'id_user' => 'required|exists:users,id_user',
+            'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'biaya' => 'nullable|numeric',
             'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
         ]);
@@ -161,6 +164,7 @@ class PerbaikanController extends Controller
             'jenis_perbaikan' => $validated['jenis_perbaikan'],
             'deskripsi' => $validated['deskripsi'] ?? null,
             'id_user' => $validated['id_user'],
+            'id_vendor' => $validated['id_vendor'] ?? $perbaikan->id_vendor,
             'biaya' => $validated['biaya'] ?? null,
             'status' => $validated['status'] ?? $perbaikan->status,
         ]);

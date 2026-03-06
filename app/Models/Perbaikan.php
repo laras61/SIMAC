@@ -18,6 +18,7 @@ class Perbaikan extends Model
         'jenis_perbaikan',
         'deskripsi',
         'id_user',
+        'id_vendor',
         'biaya',
         'status',
     ];
@@ -32,5 +33,10 @@ class Perbaikan extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+    
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class, 'id_vendor', 'id_vendor');
     }
 }
