@@ -56,7 +56,7 @@
                 </h3>
             </div>
             <div class="p-6">
-                <form action="{{ route('perbaikan.insert') }}" method="POST">
+                <form id="laporForm" action="{{ route('perbaikan.insert') }}" method="POST">
                     @csrf
                     <input type="hidden" name="status" value="baru">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -103,8 +103,18 @@
 
         <!-- Tabel Riwayat -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h3 class="font-bold text-gray-800">Riwayat Perbaikan Saya</h3>
+                
+                <!-- Filter Status -->
+                <form action="{{ route('perbaikan.index') }}" method="GET" class="flex items-center gap-2">
+                    <select name="status" onchange="this.form.submit()" class="text-sm rounded-lg border-gray-300 border p-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="">Semua Status</option>
+                        <option value="baru" {{ request('status') == 'baru' ? 'selected' : '' }}>Baru</option>
+                        <option value="proses" {{ request('status') == 'proses' ? 'selected' : '' }}>Diproses</option>
+                        <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                </form>
             </div>
             
             @if($items->isEmpty())
@@ -120,16 +130,21 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">No</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aset AC</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kerusakan</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Biaya</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($items as $item)
+                            @foreach($items as $index => $item)
                             <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $index + 1 }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ \Carbon\Carbon::parse($item->tanggal_perbaikan)->format('d M Y') }}
                                 </td>
@@ -239,6 +254,27 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                confirmButtonColor: '#0d9488'
+            });
+        </script>
+    @endif
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#0d9488'
+            });
+        </script>
+    @endif
     <script>
         const biayaDisplay = document.getElementById('biaya_display');
         const biayaActual = document.getElementById('biaya_actual');
@@ -251,6 +287,27 @@
             } else {
                 this.value = '';
             }
+        });
+
+        // Konfirmasi Submit Laporan Baru
+        document.getElementById('laporForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            
+            Swal.fire({
+                title: 'Kirim Laporan?',
+                text: "Pastikan data kerusakan yang Anda masukkan sudah benar.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ea580c', // orange-600
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Kirim Laporan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         });
 
         // Modal Logic
