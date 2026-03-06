@@ -173,7 +173,8 @@
                         <label for="status_filter">Filter Status</label>
                         <select id="status_filter" name="status">
                             <option value="">Semua status</option>
-                            @foreach ($statusOptions as $statusOption)
+            </th>
+                            <th>                @foreach ($statusOptions as $statusOption)
                                 <option value="{{ $statusOption }}" {{ request('status') === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
                             @endforeach
                         </select>
@@ -204,7 +205,7 @@
                                 <td>{{ optional($row->user)->nama ?: '-' }}</td>
                                 <td>
                                     <div class="row-actions">
-                                        <a href="{{ route('vendor.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_vendor])) }}" class="btn btn-warning">Edit</a>
+                                        <a href="{{ route('vendor.index', array_merge(r8quest()->only(['q', 'status']), ['edit' => $row->id_vendor])) }}" class="btn btn-warning">Edit</a>
                                         <form method="POST" action="{{ route('vendor.destroy', $row->id_vendor) }}" class="delete-form" data-item="{{ $row->nama_vendor }}">
                                             @csrf
                                             @method('DELETE')

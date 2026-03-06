@@ -20,8 +20,6 @@ class VendorController extends Controller
                     $sub->where('nama_vendor', 'like', '%' . $search . '%')
                         ->orWhere('email', 'like', '%' . $search . '%')
                         ->orWhere('no_hp', 'like', '%' . $search . '%')
-                        ->orWhere('pic_nama', 'like', '%' . $search . '%')
-                        ->orWhere('pic_no_hp', 'like', '%' . $search . '%')
                         ->orWhere('layanan', 'like', '%' . $search . '%')
                         ->orWhereHas('user', function ($userQuery) use ($search) {
                             $userQuery->where('nama', 'like', '%' . $search . '%');
@@ -54,8 +52,6 @@ class VendorController extends Controller
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
             'id_user' => 'nullable|exists:users,id_user',
-            'pic_nama' => 'nullable|string|max:255',
-            'pic_no_hp' => 'nullable|string|max:20',
             'layanan' => 'required|in:maintenance,perbaikan',
             'status' => 'required|in:aktif,nonaktif',
             'catatan' => 'nullable|string',
@@ -79,8 +75,6 @@ class VendorController extends Controller
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
             'id_user' => 'nullable|exists:users,id_user',
-            'pic_nama' => 'nullable|string|max:255',
-            'pic_no_hp' => 'nullable|string|max:20',
             'layanan' => 'required|in:maintenance,perbaikan',
             'status' => 'required|in:aktif,nonaktif',
             'catatan' => 'nullable|string',

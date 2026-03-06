@@ -23,7 +23,7 @@ class MaintenanceController extends Controller
         $search = trim((string) request('q', ''));
         $status = trim((string) request('status', ''));
 
-        $itemsQuery = Maintenance::with(['barang', 'user'])
+        $itemsQuery = Maintenance::with(['barang', 'user', 'vendor'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('jenis', 'like', '%' . $search . '%')
@@ -51,7 +51,7 @@ class MaintenanceController extends Controller
 
         $editItem = null;
         if (request()->filled('edit')) {
-            $editItem = Maintenance::with(['barang', 'user'])->find(request('edit'));
+            $editItem = Maintenance::with(['barang', 'user', 'vendor'])->find(request('edit'));
         }
 
         return view('maintenance.index', compact('items', 'listPic', 'editItem', 'search', 'status'));
@@ -88,6 +88,7 @@ class MaintenanceController extends Controller
                     $query->where('role', 'staff');
                 }),
             ],
+            'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'tanggal_dikerjakan' => 'nullable|date',
             'catatan' => 'nullable|string',
             'status' => 'required|in:proses,selesai',
