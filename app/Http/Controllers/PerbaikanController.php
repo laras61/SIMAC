@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Perbaikan;
 use App\Models\Barang;
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
@@ -26,7 +27,7 @@ class PerbaikanController extends Controller
         $search = trim((string) request('q', ''));
         $status = trim((string) request('status', ''));
 
-        $itemsQuery = Perbaikan::with(['barang', 'user'])
+        $itemsQuery = Perbaikan::with(['barang', 'user', 'vendor'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('jenis_perbaikan', 'like', '%' . $search . '%')
@@ -38,6 +39,9 @@ class PerbaikanController extends Controller
                         })
                         ->orWhereHas('user', function ($userQuery) use ($search) {
                             $userQuery->where('nama', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('vendor', function ($vendorQuery) use ($search) {
+                            $vendorQuery->where('nama_vendor', 'like', '%' . $search . '%');
                         });
                 });
             })
@@ -46,6 +50,12 @@ class PerbaikanController extends Controller
             });
 
         $items = $itemsQuery->latest('id_perbaikan')->get();
+        $listVendors = Vendor::query()
+            ->where('layanan', 'perbaikan')
+            ->where('status', 'aktif')
+            ->select('id_vendor', 'nama_vendor')
+            ->orderBy('nama_vendor')
+            ->get();
         $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
         $listTeknisi = User::query()
             ->whereIn('role', ['teknisi', 'staff', 'admin'])
@@ -55,23 +65,34 @@ class PerbaikanController extends Controller
 
         $editItem = null;
         if (request()->filled('edit')) {
-            $editItem = Perbaikan::with(['barang', 'user'])->find(request('edit'));
+            $editItem = Perbaikan::with(['barang', 'user', 'vendor'])->find(request('edit'));
         }
 
-        return view('perbaikan.index', compact('items', 'listBarang', 'listTeknisi', 'editItem', 'search', 'status'));
+        return view('perbaikan.index', compact('items', 'listVendors', 'listBarang', 'listTeknisi', 'editItem', 'search', 'status'));
     }
 
     private function staffIndex()
     {
         $userId = auth()->id();
-        $items = Perbaikan::with(['barang'])
+        $status = trim((string) request('status', ''));
+        $items = Perbaikan::with(['barang', 'vendor'])
             ->where('id_user', $userId)
+            ->when($status !== '', function ($query) use ($status) {
+                $query->where('status', $status);
+            })
             ->orderBy('tanggal_perbaikan', 'desc')
             ->get();
         
         $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
+        $listVendors = Vendor::query()
+            ->where('id_user', $userId)
+            ->where('layanan', 'perbaikan')
+            ->where('status', 'aktif')
+            ->select('id_vendor', 'nama_vendor')
+            ->orderBy('nama_vendor')
+            ->get();
             
-        return view('perbaikan.staff_index', compact('items', 'listBarang'));
+        return view('perbaikan.staff_index', compact('items', 'listBarang', 'listVendors', 'status'));
     }
 
     /**
@@ -91,7 +112,16 @@ class PerbaikanController extends Controller
             'jenis_perbaikan' => 'required|string',
             'deskripsi' => 'nullable|string',
             'id_user' => 'required|exists:users,id_user',
-            'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
+            'id_vendor' => [
+                'nullable',
+                Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
+                    if ($user && in_array($user->role, ['staff', 'pic'], true)) {
+                        $q->where('id_user', $user->id_user);
+                    }
+                    $q->where('layanan', 'perbaikan')
+                      ->where('status', 'aktif');
+                }),
+            ],
             'biaya' => 'nullable|numeric',
             'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
         ]);
@@ -136,6 +166,15 @@ class PerbaikanController extends Controller
 
             $validated = $request->validate([
                 'status' => ['required', Rule::in(['baru', 'proses', 'selesai'])],
+                'tanggal_perbaikan' => 'required|date',
+                'id_vendor' => [
+                    'nullable',
+                    Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
+                        $q->where('id_user', $user->id_user)
+                          ->where('layanan', 'perbaikan')
+                          ->where('status', 'aktif');
+                    }),
+                ],
                 'biaya' => 'nullable|numeric',
                 'deskripsi' => 'nullable|string',
             ]);

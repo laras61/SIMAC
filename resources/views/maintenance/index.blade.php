@@ -113,6 +113,15 @@
                                 </select>
                             </div>
                             <div class="field">
+                                <label for="id_vendor">Vendor</label>
+                                <select id="id_vendor" name="id_vendor">
+                                    <option value="">-</option>
+                                    @foreach ($listVendors as $vendor)
+                                        <option value="{{ $vendor->id_vendor }}" {{ (string) old('id_vendor', $editItem->id_vendor) === (string) $vendor->id_vendor ? 'selected' : '' }}>{{ $vendor->nama_vendor }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field">
                                 <label for="status">Status</label>
                                 <select id="status" name="status" required>
                                     @foreach ($statusUpdateOptions as $statusOption)
@@ -165,6 +174,7 @@
                             <th>Tanggal Dikerjakan</th>
                             <th>Barang</th>
                             <th>PIC</th>
+                            <th>Vendor</th>
                             <th>Jenis</th>
                             <th>Status</th>
                             <th>Catatan</th>
@@ -179,6 +189,7 @@
                                 <td>{{ $row->tanggal_dikerjakan ?: '-' }}</td>
                                 <td>{{ optional($row->barang)->kode_bmn ?? '-' }} - {{ optional($row->barang)->merk ?? '-' }}</td>
                                 <td>{{ optional($row->user)->nama ?? '-' }}</td>
+                                <td>{{ optional($row->vendor)->nama_vendor ?? '-' }}</td>
                                 <td>{{ $row->jenis }}</td>
                                 <td><span class="badge {{ $row->status }}">{{ $row->status }}</span></td>
                                 <td>{{ $row->catatan ?: '-' }}</td>
@@ -189,7 +200,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9">Belum ada data.</td></tr>
+                            <tr><td colspan="10">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

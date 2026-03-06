@@ -63,6 +63,77 @@
         </div>
         @endif
 
+        <!-- Form Input Maintenance -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-gray-100 bg-teal-50">
+                <h3 class="font-bold text-teal-800">Input Maintenance</h3>
+            </div>
+            <div class="p-6">
+                <form action="{{ route('maintenance.insert') }}" method="POST">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Aset AC <span class="text-red-500">*</span></label>
+                            <select name="id_ac" required class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="">-- Pilih AC --</option>
+                                @foreach($listBarang as $barang)
+                                    <option value="{{ $barang->id_ac }}">{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Jadwal <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_jadwal" required value="{{ date('Y-m-d') }}" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis <span class="text-red-500">*</span></label>
+                            <select name="jenis" required class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="preventive">Preventive</option>
+                                <option value="corrective">Corrective</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                            <select name="status" required class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="pending">Pending</option>
+                                <option value="proses" selected>Proses</option>
+                                <option value="selesai">Selesai</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                            <select name="id_vendor" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="">-</option>
+                                @foreach($listVendors as $vendor)
+                                    <option value="{{ $vendor->id_vendor }}">{{ $vendor->nama_vendor }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikerjakan</label>
+                            <input type="date" name="tanggal_dikerjakan" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan <span class="text-red-500">*</span></label>
+                            <textarea name="catatan" required rows="3" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Tuliskan catatan pengerjaan..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex justify-end">
+                        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 font-medium shadow-sm transition-colors">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                 <h3 class="font-bold text-gray-800">Daftar Tugas Maintenance</h3>
@@ -118,7 +189,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     @if($item->status != 'selesai')
-                                        <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}')" 
+                                        <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}')" 
                                             class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
                                             Update Status
                                         </button>
@@ -178,8 +249,23 @@
                                         </div>
 
                                         <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                                            <select name="id_vendor" id="modalVendor" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md border">
+                                                <option value="">-</option>
+                                                @foreach($listVendors as $vendor)
+                                                    <option value="{{ $vendor->id_vendor }}">{{ $vendor->nama_vendor }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Pengerjaan <span class="text-red-500">*</span></label>
-                                            <textarea name="catatan" required rows="3" class="shadow-sm focus:ring-teal-500 focus:border-teal-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2" placeholder="Tambahkan catatan teknis..."></textarea>
+                                            <textarea name="catatan" id="modalCatatan" required rows="3" class="shadow-sm focus:ring-teal-500 focus:border-teal-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2" placeholder="Tambahkan catatan teknis..."></textarea>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikerjakan</label>
+                                            <input type="date" name="tanggal_dikerjakan" id="modalTanggalDikerjakan" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md border">
                                         </div>
                                     </div>
                                 </div>
@@ -222,11 +308,14 @@
     @endif
 
     <script>
-        function openUpdateModal(id, asetName, currentStatus) {
+        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan) {
             const modal = document.getElementById('updateModal');
             const form = document.getElementById('updateForm');
             const asestNameSpan = document.getElementById('modalAsetName');
             const statusSelect = document.getElementById('modalStatus');
+            const vendorSelect = document.getElementById('modalVendor');
+            const catatanInput = document.getElementById('modalCatatan');
+            const tanggalInput = document.getElementById('modalTanggalDikerjakan');
             
             // Set action URL dynamically
             form.action = `/maintenance/update/${id}`;
@@ -237,6 +326,18 @@
             // Set current status if not pending
             if (currentStatus !== 'pending') {
                 statusSelect.value = currentStatus;
+            }
+
+            if (vendorSelect) {
+                vendorSelect.value = vendorId || '';
+            }
+
+            if (catatanInput) {
+                catatanInput.value = catatan || '';
+            }
+
+            if (tanggalInput) {
+                tanggalInput.value = tanggalDikerjakan || '';
             }
             
             modal.classList.remove('hidden');

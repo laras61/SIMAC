@@ -116,14 +116,6 @@
                                 </select>
                             </div>
                             <div class="field">
-                                <label for="pic_nama">PIC Vendor</label>
-                                <input id="pic_nama" type="text" name="pic_nama" value="{{ old('pic_nama', $editItem->pic_nama) }}">
-                            </div>
-                            <div class="field">
-                                <label for="pic_no_hp">No HP PIC</label>
-                                <input id="pic_no_hp" type="text" name="pic_no_hp" value="{{ old('pic_no_hp', $editItem->pic_no_hp) }}">
-                            </div>
-                            <div class="field">
                                 <label for="layanan">Layanan</label>
                                 @php $layananEdit = old('layanan', $editItem->layanan); @endphp
                                 <select id="layanan" name="layanan" required>
@@ -173,8 +165,7 @@
                         <label for="status_filter">Filter Status</label>
                         <select id="status_filter" name="status">
                             <option value="">Semua status</option>
-            </th>
-                            <th>                @foreach ($statusOptions as $statusOption)
+                            @foreach ($statusOptions as $statusOption)
                                 <option value="{{ $statusOption }}" {{ request('status') === $statusOption ? 'selected' : '' }}>{{ $statusOption }}</option>
                             @endforeach
                         </select>
@@ -186,7 +177,6 @@
                             <th>No</th>
                             <th>Nama Vendor</th>
                             <th>Kontak</th>
-                            <th>PIC</th>
                             <th>Layanan</th>
                             <th>Status</th>
                             <th>User Internal</th>
@@ -199,13 +189,12 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $row->nama_vendor }}</td>
                                 <td>{{ $row->email ?: '-' }} / {{ $row->no_hp ?: '-' }}</td>
-                                <td>{{ $row->pic_nama ?: '-' }} / {{ $row->pic_no_hp ?: '-' }}</td>
                                 <td>{{ $row->layanan ?: '-' }}</td>
                                 <td>{{ $row->status }}</td>
                                 <td>{{ optional($row->user)->nama ?: '-' }}</td>
                                 <td>
                                     <div class="row-actions">
-                                        <a href="{{ route('vendor.index', array_merge(r8quest()->only(['q', 'status']), ['edit' => $row->id_vendor])) }}" class="btn btn-warning">Edit</a>
+                                        <a href="{{ route('vendor.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_vendor])) }}" class="btn btn-warning">Edit</a>
                                         <form method="POST" action="{{ route('vendor.destroy', $row->id_vendor) }}" class="delete-form" data-item="{{ $row->nama_vendor }}">
                                             @csrf
                                             @method('DELETE')
@@ -252,14 +241,6 @@
                                 <option value="{{ $user->id_user }}" {{ (string) old('id_user') === (string) $user->id_user ? 'selected' : '' }}>{{ $user->nama }}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="field">
-                        <label for="add_pic_nama">PIC Vendor</label>
-                        <input id="add_pic_nama" type="text" name="pic_nama" value="{{ old('pic_nama') }}">
-                    </div>
-                    <div class="field">
-                        <label for="add_pic_no_hp">No HP PIC</label>
-                        <input id="add_pic_no_hp" type="text" name="pic_no_hp" value="{{ old('pic_no_hp') }}">
                     </div>
                     <div class="field">
                         <label for="add_layanan">Layanan</label>
