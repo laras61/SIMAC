@@ -89,7 +89,7 @@ class BarangController extends Controller
             'tipe_ac' => 'required|string',
             'tgl_beli' => 'required|date',
             'tgl_instalasi' => 'required|date',
-            'lokasi' => 'required|in:LAB A,LAB B,LAB,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
+            'lokasi' => 'required|in:LAB A,LAB B,LAB C,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
             'status' => 'required|in:aktif,rusak,nonaktif',
         ]);
 
@@ -120,7 +120,7 @@ class BarangController extends Controller
             'tipe_ac' => 'required|string',
             'tgl_beli' => 'required|date',
             'tgl_instalasi' => 'required|date',
-            'lokasi' => 'required|in:LAB A,LAB B,LAB,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
+            'lokasi' => 'required|in:LAB A,LAB B,LAB C,LAB D,LAB E,LAB F,RUANG SEKRE,RUANG DOSEN',
             'status' => 'required|in:aktif,rusak,nonaktif',
         ]);
 

@@ -30,18 +30,56 @@
             color: var(--text);
         }
         .wrap {
-            width: min(1040px, calc(100% - 28px));
-            margin: 18px auto 32px;
+            width: min(1280px, calc(100% - 28px));
+            margin: 22px auto 32px;
         }
-        .top {
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
-            gap: 12px;
+        .welcome-card {
+            position: relative;
             margin-bottom: 14px;
+            border-radius: 16px;
+            padding: 28px;
+            color: #fff;
+            background: linear-gradient(90deg, #0f766e, #134e4a);
+            box-shadow: 0 16px 36px rgba(15, 118, 110, .24);
+            overflow: hidden;
         }
-        h1 { margin: 0; font-size: 24px; }
-        .sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+        }
+        .welcome-title {
+            margin: 0 0 6px;
+            font-size: 30px;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+        .welcome-text {
+            margin: 0;
+            color: #ccfbf1;
+            opacity: .95;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .welcome-stripe {
+            position: absolute;
+            top: 0;
+            right: -90px;
+            width: 36%;
+            height: 100%;
+            background: rgba(255, 255, 255, .06);
+            transform: skewX(12deg);
+        }
+        .welcome-glow {
+            position: absolute;
+            right: 40px;
+            bottom: 28px;
+            width: 130px;
+            height: 130px;
+            border-radius: 999px;
+            background: rgba(20, 184, 166, .24);
+            filter: blur(22px);
+        }
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -134,17 +172,30 @@
         .panel:nth-of-type(1) { border-top-color: #0f766e; }
         .panel:nth-of-type(2) { border-top-color: #0f766e; }
         .panel:nth-of-type(3) { border-top-color: #475569; }
+        @media (max-width: 760px) {
+            .welcome-card {
+                padding: 22px;
+            }
+            .welcome-title {
+                font-size: 24px;
+            }
+            .welcome-text {
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
     @include('partials.nav')
 
     <div class="wrap">
-        <div class="top">
-            <div>
-                <h1>Dashboard SIMAC</h1>
-                <p class="sub">Informasi operasional AC</p>
+        <div class="welcome-card">
+            <div class="welcome-content">
+                <h2 class="welcome-title">Selamat Datang, {{ explode(' ', auth()->user()->nama ?? 'Admin')[0] }}!</h2>
+                <p class="welcome-text">Anda berada di dashboard Admin.</p>
             </div>
+            <div class="welcome-stripe" aria-hidden="true"></div>
+            <div class="welcome-glow" aria-hidden="true"></div>
         </div>
 
         <div class="stats">
