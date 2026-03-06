@@ -15,6 +15,11 @@ class UserController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if (in_array($user->role, ['staff', 'pic'])) {
+            return view('user.staff_profile', compact('user'));
+        }
+
         $search = trim((string) request('q', ''));
         $role = trim((string) request('role', ''));
 
@@ -78,11 +83,17 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // Pastikan user hanya bisa mengupdate dirinya sendiri jika bukan admin
+        if (auth()->user()->role !== 'admin' && auth()->id() !== $user->id_user) {
+            abort(403, 'Unauthorized');
+        }
+
         // Validasi input update
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
-            'password' => 'nullable|string|min:8', // Password opsional saat update
+            'current_password' => 'nullable|required_with:password|string',
+            'password' => 'nullable|string|min:8|confirmed', // Password opsional saat update
             'no_hp' => 'nullable|string|max:15',
             'role' => ['nullable', Rule::in(['admin', 'staff', 'pic'])],
         ]);
@@ -93,20 +104,30 @@ class UserController extends Controller
             'no_hp' => $validated['no_hp'] ?? null,
         ];
 
-        // Jika password diisi, enkripsi dan tambahkan ke data yang diupdate
-        if (! empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
-        }
-
-        if (! empty($validated['role'])) {
+        // Role hanya bisa diupdate oleh admin
+        if (auth()->user()->role === 'admin' && ! empty($validated['role'])) {
             $data['role'] = $validated['role'];
         }
 
+        // Jika password diisi, enkripsi dan tambahkan ke data yang diupdate
+        if (! empty($validated['password'])) {
+            // Verifikasi password saat ini
+            if (! Hash::check($validated['current_password'], $user->password)) {
+                return back()->withErrors(['current_password' => 'Password saat ini salah.'])->withInput();
+            }
+            $data['password'] = Hash::make($validated['password']);
+        }
+        
         $user->update($data);
+
+        // Jika staff/pic, redirect kembali ke halaman dashboard
+        if (in_array(auth()->user()->role, ['staff', 'pic'])) {
+            return redirect()->route('staff.dashboard')->with('success', 'Profil berhasil diperbarui.');
+        }
 
         return redirect()
             ->route('user.index')
-            ->with('success', 'User berhasil diupdate.');
+            ->with('success', 'User berhasil diperbarui.');
     }
 
     /**

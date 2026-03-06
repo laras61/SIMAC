@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya - SIMAC Staff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('staff.dashboard') }}" class="flex items-center gap-2 text-gray-500 hover:text-teal-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span class="font-medium">Kembali</span>
+                    </a>
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    <span class="text-xl font-bold text-teal-800">Profil Saya</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        
+        <!-- Pesan Sukses -->
+        @if(session('success'))
+        <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-sm">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-teal-600 to-teal-800 px-6 py-8 text-center">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl font-bold text-teal-700 uppercase">
+                    {{ substr($user->nama, 0, 1) }}
+                </div>
+                <h2 class="text-2xl font-bold text-white">{{ $user->nama }}</h2>
+                <p class="text-teal-100 opacity-90 font-medium uppercase tracking-wider text-sm mt-1">{{ $user->role }}</p>
+            </div>
+
+            <div class="p-8">
+                <form action="{{ route('user.update', $user->id_user) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" name="nama" value="{{ old('nama', $user->nama) }}" required class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow">
+                            @error('nama') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow bg-gray-50" readonly>
+                            <p class="text-xs text-gray-500 mt-1">Email tidak dapat diubah secara mandiri. Hubungi admin jika perlu perubahan.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP / WhatsApp</label>
+                            <input type="text" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow" placeholder="08xxxxxxxxxx">
+                            @error('no_hp') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-6 mt-2">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Ganti Password</h3>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-sm text-yellow-800">
+                                Kosongkan bagian ini jika tidak ingin mengubah password.
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
+                                    <input type="password" name="current_password" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow" placeholder="Masukkan password lama">
+                                    @error('current_password') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+                                    <input type="password" name="password" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow" placeholder="Minimal 8 karakter">
+                                    @error('password') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+                                    <input type="password" name="password_confirmation" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow" placeholder="Ulangi password baru">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-end gap-3">
+                        <a href="{{ route('staff.dashboard') }}" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors">
+                            Batal
+                        </a>
+                        <button type="submit" class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 font-medium shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

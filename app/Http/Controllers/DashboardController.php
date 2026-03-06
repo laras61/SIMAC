@@ -12,8 +12,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (in_array(Auth::user()->role, ['staff', 'pic', 'teknisi'])) {
+            return redirect()->route('staff.dashboard');
+        }
+
         if (Auth::user()->role !== 'admin') {
-            return redirect()->route('teknisi.dashboard');
+            abort(403, 'Unauthorized');
         }
 
         $today = Carbon::today();
@@ -87,10 +91,31 @@ class DashboardController extends Controller
 
     public function teknisi()
     {
-        if (! in_array(Auth::user()->role, ['staff', 'pic'], true)) {
+        return redirect()->route('staff.dashboard');
+    }
+
+    public function staff()
+    {
+        if (! in_array(Auth::user()->role, ['staff', 'pic', 'teknisi'])) {
             return redirect()->route('dashboard');
         }
+
+        $userId = Auth::id();
+
+        // Ambil jadwal maintenance yang ditugaskan ke user ini
+        $myMaintenances = Maintenance::with('barang:id_ac,kode_bmn,lokasi')
+            ->where('id_user', $userId)
+            ->whereNull('tanggal_dikerjakan') // Hanya yang belum selesai
+            ->orderBy('tanggal_jadwal', 'asc')
+            ->get();
+
+        // Ambil riwayat perbaikan yang dilaporkan/ditangani oleh user ini
+        $myRepairs = Perbaikan::with('barang:id_ac,kode_bmn,lokasi')
+            ->where('id_user', $userId)
+            ->orderByDesc('tanggal_perbaikan')
+            ->take(5)
+            ->get();
         
-        return view('teknisi_dashboard');
+        return view('staff_dashboard', compact('myMaintenances', 'myRepairs'));
     }
 }

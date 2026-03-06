@@ -16,6 +16,13 @@ class PerbaikanController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
+        // Jika staff/pic, arahkan ke view khusus staff
+        if (in_array($user->role, ['staff', 'pic'])) {
+            return $this->staffIndex();
+        }
+
         $search = trim((string) request('q', ''));
         $status = trim((string) request('status', ''));
 
@@ -54,11 +61,29 @@ class PerbaikanController extends Controller
         return view('perbaikan.index', compact('items', 'listBarang', 'listTeknisi', 'editItem', 'search', 'status'));
     }
 
+    private function staffIndex()
+    {
+        $userId = auth()->id();
+        $items = Perbaikan::with(['barang'])
+            ->where('id_user', $userId)
+            ->orderBy('tanggal_perbaikan', 'desc')
+            ->get();
+        
+        $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
+            
+        return view('perbaikan.staff_index', compact('items', 'listBarang'));
+    }
+
     /**
      * Insert a newly created resource in storage.
      */
     public function insert(Request $request)
     {
+        $user = auth()->user();
+        if (in_array($user->role, ['staff', 'pic'])) {
+            $request->merge(['id_user' => $user->id_user]);
+        }
+        
         // Validasi input
         $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
@@ -98,7 +123,27 @@ class PerbaikanController extends Controller
      */
     public function update(Request $request, Perbaikan $perbaikan)
     {
-        // Validasi input
+        $user = auth()->user();
+
+        // Validasi khusus untuk Staff/PIC
+        if (in_array($user->role, ['staff', 'pic'])) {
+            // Pastikan perbaikan ini milik user yang login
+            if ($perbaikan->id_user !== $user->id_user) {
+                abort(403, 'Unauthorized');
+            }
+
+            $validated = $request->validate([
+                'status' => ['required', Rule::in(['baru', 'proses', 'selesai'])],
+                'biaya' => 'nullable|numeric',
+                'deskripsi' => 'nullable|string',
+            ]);
+
+            $perbaikan->update($validated);
+            
+            return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil diperbarui.');
+        }
+
+        // Validasi untuk Admin (full update)
         $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
             'tanggal_perbaikan' => 'required|date',
