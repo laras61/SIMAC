@@ -38,6 +38,10 @@ class BarangController extends Controller
             $editItem = Barang::find(request('edit'));
         }
 
+        if (auth()->check() && in_array(auth()->user()->role, ['staff', 'pic'])) {
+            return view('barang.staff_index', compact('items', 'search', 'status'));
+        }
+
         return view('barang.index', compact('items', 'editItem', 'search', 'status'));
     }
 

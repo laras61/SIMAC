@@ -49,19 +49,47 @@
 
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="bg-gradient-to-r from-teal-600 to-teal-800 px-6 py-8 text-center">
-                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl font-bold text-teal-700 uppercase">
-                    {{ substr($user->nama, 0, 1) }}
-                </div>
+                @if($user->foto_profi)
+                    <div class="relative w-24 h-24 rounded-full mx-auto mb-4 shadow-lg overflow-hidden border-4 border-white group">
+                        <img src="{{ url('/files/' . $user->foto_profi) }}" alt="Foto Profil" class="w-full h-full object-cover">
+                        <a href="{{ url('/files/' . $user->foto_profi) }}" target="_blank" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </a>
+                    </div>
+                @else
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl font-bold text-teal-700 uppercase">
+                        {{ substr($user->nama, 0, 1) }}
+                    </div>
+                @endif
                 <h2 class="text-2xl font-bold text-white">{{ $user->nama }}</h2>
                 <p class="text-teal-100 opacity-90 font-medium uppercase tracking-wider text-sm mt-1">{{ $user->role }}</p>
             </div>
 
             <div class="p-8">
-                <form action="{{ route('user.update', $user->id_user) }}" method="POST">
+                <form action="{{ route('user.update', $user->id_user) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
                     
                     <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto Profil</label>
+                            <div class="flex items-center gap-4">
+                                @if($user->foto_profi)
+                                    <div class="relative w-16 h-16 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 group">
+                                        <img src="{{ url('/files/' . $user->foto_profi) }}" alt="Current Profile" class="w-full h-full object-cover">
+                                        <a href="{{ url('/files/' . $user->foto_profi) }}" target="_blank" class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        </a>
+                                    </div>
+                                @endif
+                                <div class="flex-1">
+                                    <input type="file" name="foto_profi" accept="image/jpeg,image/png,image/jpg" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition-all border border-gray-300 rounded-lg cursor-pointer">
+                                    <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 2MB.</p>
+                                </div>
+                            </div>
+                            @error('foto_profi') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
                             <input type="text" name="nama" value="{{ old('nama', $user->nama) }}" required class="w-full rounded-lg border-gray-300 border p-3 focus:ring-teal-500 focus:border-teal-500 transition-shadow">

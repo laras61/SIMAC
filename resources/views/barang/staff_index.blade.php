@@ -116,6 +116,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tgl Instalasi</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -146,6 +147,27 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Nonaktif</span>
                                     @endif
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button
+                                        type="button"
+                                        onclick="openDetailModal(this)"
+                                        data-kode-bmn="{{ $item->kode_bmn }}"
+                                        data-merk="{{ $item->merk }}"
+                                        data-tipe-ac="{{ $item->tipe_ac }}"
+                                        data-serial-number="{{ $item->serial_number }}"
+                                        data-lokasi="{{ $item->lokasi }}"
+                                        data-tgl-beli="{{ $item->tgl_beli ? \Carbon\Carbon::parse($item->tgl_beli)->format('d M Y') : '-' }}"
+                                        data-tgl-instalasi="{{ $item->tgl_instalasi ? \Carbon\Carbon::parse($item->tgl_instalasi)->format('d M Y') : '-' }}"
+                                        data-status="{{ $item->status }}"
+                                        class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                                        title="Lihat detail aset"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -155,5 +177,85 @@
         </div>
     </div>
 
-</body>
-</html>
+    <!-- Modal Detail Aset -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="detail-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-5 pt-5 pb-4 sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <h3 class="text-lg leading-6 font-semibold text-gray-900" id="detail-modal-title">Detail Aset AC</h3>
+                        <button type="button" onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600" aria-label="Tutup detail">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-500">Kode BMN</p>
+                            <p id="detailKode" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Status</p>
+                            <p id="detailStatus" class="font-medium text-gray-900 capitalize">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Merk</p>
+                            <p id="detailMerk" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Tipe</p>
+                            <p id="detailTipe" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-gray-500">Serial Number</p>
+                            <p id="detailSerial" class="font-medium text-gray-900 font-mono bg-gray-50 p-1 rounded inline-block">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Lokasi</p>
+                            <p id="detailLokasi" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Tanggal Beli</p>
+                            <p id="detailTglBeli" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Tanggal Instalasi</p>
+                            <p id="detailTglInstalasi" class="font-medium text-gray-900">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3 text-right">
+                    <button type="button" onclick="closeDetailModal()" class="inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openDetailModal(button) {
+            const data = button.dataset;
+            
+            document.getElementById('detailKode').textContent = data.kodeBmn || '-';
+            document.getElementById('detailStatus').textContent = data.status || '-';
+            document.getElementById('detailMerk').textContent = data.merk || '-';
+            document.getElementById('detailTipe').textContent = data.tipeAc || '-';
+            document.getElementById('detailSerial').textContent = data.serialNumber || '-';
+            document.getElementById('detailLokasi').textContent = data.lokasi || '-';
+            document.getElementById('detailTglBeli').textContent = data.tglBeli || '-';
+            document.getElementById('detailTglInstalasi').textContent = data.tglInstalasi || '-';
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+    </script>

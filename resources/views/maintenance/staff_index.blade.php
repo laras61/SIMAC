@@ -63,7 +63,6 @@
         </div>
         @endif
 
-<<<<<<< HEAD
         <!-- Form Input Maintenance -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-gray-100 bg-teal-50">
@@ -142,9 +141,6 @@
                 </form>
             </div>
         </div>
-
-=======
->>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                 <h3 class="font-bold text-gray-800">Daftar Tugas Maintenance</h3>
@@ -213,12 +209,6 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-<<<<<<< HEAD
-                                    @if($item->status != 'selesai')
-                                        <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}', '{{ addslashes($item->foto) }}')" 
-                                            class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
-                                            Update Status
-=======
                                     <div class="flex items-center gap-2">
                                         <button
                                             type="button"
@@ -243,11 +233,10 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
                                             </svg>
->>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
                                         </button>
 
                                         @if($item->status != 'selesai')
-                                            <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}')" 
+                                            <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}', '{{ addslashes($item->foto) }}')" 
                                                 class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
                                                 Update Status
                                             </button>
@@ -449,9 +438,6 @@
     @endif
 
     <script>
-<<<<<<< HEAD
-        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan, fotoPath) {
-=======
         function formatDateId(value) {
             if (!value) return '-';
 
@@ -467,11 +453,18 @@
 
         function openDetailModal(button) {
             const data = button.dataset;
+            
+            // Debugging: Log data untuk memastikan properti ada
+            console.log('Detail Data:', data);
 
+            // Perbaiki cara akses dataset (camelCase otomatis dari data-*)
             document.getElementById('detailAset').textContent = [data.kodeBmn, data.merk].filter(Boolean).join(' - ') || '-';
             document.getElementById('detailLokasi').textContent = data.lokasi || '-';
-            document.getElementById('detailTanggalJadwal').textContent = formatDateId(data.tanggalJadwal);
-            document.getElementById('detailTanggalDikerjakan').textContent = formatDateId(data.tanggalDikerjakan);
+            
+            // Format tanggal manual jika fungsi formatDateId bermasalah atau data string
+            document.getElementById('detailTanggalJadwal').textContent = data.tanggalJadwal ? formatDateId(data.tanggalJadwal) : '-';
+            document.getElementById('detailTanggalDikerjakan').textContent = data.tanggalDikerjakan ? formatDateId(data.tanggalDikerjakan) : '-';
+            
             document.getElementById('detailJenis').textContent = data.jenis || '-';
             document.getElementById('detailStatus').textContent = data.status || '-';
             document.getElementById('detailVendor').textContent = data.vendorNama || '-';
@@ -487,8 +480,7 @@
             document.getElementById('detailModal').classList.add('hidden');
         }
 
-        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan) {
->>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
+        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan, fotoPath) {
             const modal = document.getElementById('updateModal');
             const form = document.getElementById('updateForm');
             const asestNameSpan = document.getElementById('modalAsetName');
