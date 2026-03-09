@@ -57,13 +57,18 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'no_hp' => 'nullable|string|max:15',
             'role' => ['nullable', Rule::in(['admin', 'staff', 'pic'])],
+            'foto_profi' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        User::create([
+        $user = User::create([
             ...$validated,
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'] ?? 'staff',
         ]);
+
+        if ($request->hasFile('foto_profi')) {
+            $user->uploadFotoProfi($request->file('foto_profi'));
+        }
 
         return redirect()
             ->route('user.index')
@@ -96,6 +101,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed', // Password opsional saat update
             'no_hp' => 'nullable|string|max:15',
             'role' => ['nullable', Rule::in(['admin', 'staff', 'pic'])],
+            'foto_profi' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = [
@@ -120,6 +126,10 @@ class UserController extends Controller
         
         $user->update($data);
 
+        if ($request->hasFile('foto_profi')) {
+            $user->uploadFotoProfi($request->file('foto_profi'));
+        }
+
         // Jika staff/pic, redirect kembali ke halaman dashboard
         if (in_array(auth()->user()->role, ['staff', 'pic'])) {
             return redirect()->route('staff.dashboard')->with('success', 'Profil berhasil diperbarui.');
@@ -136,6 +146,9 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
+            if ($user->foto_profi) {
+                $user->deleteFotoProfi();
+            }
             $user->delete();
             return redirect()
                 ->route('user.index')
