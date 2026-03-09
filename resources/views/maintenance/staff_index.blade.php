@@ -63,6 +63,88 @@
         </div>
         @endif
 
+<<<<<<< HEAD
+        <!-- Form Input Maintenance -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-gray-100 bg-teal-50">
+                <h3 class="font-bold text-teal-800">Input Maintenance</h3>
+            </div>
+            <div class="p-6">
+                <form action="{{ route('maintenance.insert') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Aset AC <span class="text-red-500">*</span></label>
+                            <select name="id_ac" required class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="">-- Pilih AC --</option>
+                                @foreach($listBarang as $barang)
+                                    <option value="{{ $barang->id_ac }}">{{ $barang->kode_bmn }} - {{ $barang->merk }} ({{ $barang->lokasi }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Jadwal <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_jadwal" required value="{{ date('Y-m-d') }}" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis <span class="text-red-500">*</span></label>
+                            <select name="jenis" required class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="preventive">Preventive</option>
+                                <option value="corrective">Corrective</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                            <select name="status" required class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="pending">Pending</option>
+                                <option value="proses" selected>Proses</option>
+                                <option value="selesai">Selesai</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                            <select name="id_vendor" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value="">-</option>
+                                @foreach($listVendors as $vendor)
+                                    <option value="{{ $vendor->id_vendor }}">{{ $vendor->nama_vendor }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikerjakan</label>
+                            <input type="date" name="tanggal_dikerjakan" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan <span class="text-red-500">*</span></label>
+                            <textarea name="catatan" required rows="3" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Tuliskan catatan pengerjaan..."></textarea>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                            <input id="fotoCreateInput" type="file" name="foto" accept="image/jpeg,image/png,image/jpg" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                            <a id="fotoCreateLink" href="#" target="_blank" rel="noopener" class="hidden mt-3 inline-block">
+                                <img id="fotoCreatePreview" src="" alt="Preview foto" class="h-32 w-auto rounded-lg border border-gray-200">
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex justify-end">
+                        <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 font-medium shadow-sm transition-colors">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+=======
+>>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                 <h3 class="font-bold text-gray-800">Daftar Tugas Maintenance</h3>
@@ -86,6 +168,8 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Dikerjakan</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
@@ -116,7 +200,25 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                     @endif
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $item->tanggal_dikerjakan ? \Carbon\Carbon::parse($item->tanggal_dikerjakan)->format('d M Y') : '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($item->foto)
+                                        <a href="{{ url('/files/' . $item->foto) }}" target="_blank" rel="noopener">
+                                            <img src="{{ url('/files/' . $item->foto) }}" alt="Foto" class="h-10 w-10 object-cover rounded border border-gray-200">
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+<<<<<<< HEAD
+                                    @if($item->status != 'selesai')
+                                        <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}', '{{ addslashes($item->foto) }}')" 
+                                            class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
+                                            Update Status
+=======
                                     <div class="flex items-center gap-2">
                                         <button
                                             type="button"
@@ -141,6 +243,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
                                             </svg>
+>>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
                                         </button>
 
                                         @if($item->status != 'selesai')
@@ -248,7 +351,7 @@
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form id="updateForm" method="POST" action="">
+                <form id="updateForm" method="POST" action="" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
                     
@@ -297,6 +400,14 @@
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikerjakan</label>
                                             <input type="date" name="tanggal_dikerjakan" id="modalTanggalDikerjakan" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md border">
                                         </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                                            <input id="fotoUpdateInput" type="file" name="foto" accept="image/jpeg,image/png,image/jpg" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md border">
+                                            <a id="fotoUpdateLink" href="#" target="_blank" rel="noopener" class="hidden mt-3 inline-block">
+                                                <img id="fotoUpdatePreview" src="" alt="Preview foto" class="h-32 w-auto rounded-lg border border-gray-200">
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -338,6 +449,9 @@
     @endif
 
     <script>
+<<<<<<< HEAD
+        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan, fotoPath) {
+=======
         function formatDateId(value) {
             if (!value) return '-';
 
@@ -374,6 +488,7 @@
         }
 
         function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan) {
+>>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
             const modal = document.getElementById('updateModal');
             const form = document.getElementById('updateForm');
             const asestNameSpan = document.getElementById('modalAsetName');
@@ -381,6 +496,8 @@
             const vendorSelect = document.getElementById('modalVendor');
             const catatanInput = document.getElementById('modalCatatan');
             const tanggalInput = document.getElementById('modalTanggalDikerjakan');
+            const fotoLink = document.getElementById('fotoUpdateLink');
+            const fotoPreview = document.getElementById('fotoUpdatePreview');
             
             // Set action URL dynamically
             form.action = `/maintenance/update/${id}`;
@@ -404,6 +521,19 @@
             if (tanggalInput) {
                 tanggalInput.value = tanggalDikerjakan || '';
             }
+
+            if (fotoLink && fotoPreview) {
+                if (fotoPath) {
+                    const url = `{{ url('/files') }}/${fotoPath}`;
+                    fotoPreview.src = url;
+                    fotoLink.href = url;
+                    fotoLink.classList.remove('hidden');
+                } else {
+                    fotoPreview.src = '';
+                    fotoLink.href = '#';
+                    fotoLink.classList.add('hidden');
+                }
+            }
             
             modal.classList.remove('hidden');
         }
@@ -412,6 +542,31 @@
             const modal = document.getElementById('updateModal');
             modal.classList.add('hidden');
         }
+
+        (function initFotoPreview() {
+            const bindPreview = (inputId, linkId, imgId) => {
+                const input = document.getElementById(inputId);
+                const link = document.getElementById(linkId);
+                const img = document.getElementById(imgId);
+                if (!input || !link || !img) return;
+                input.addEventListener('change', function () {
+                    const file = input.files && input.files[0];
+                    if (!file) {
+                        img.src = '';
+                        link.href = '#';
+                        link.classList.add('hidden');
+                        return;
+                    }
+                    const url = URL.createObjectURL(file);
+                    img.src = url;
+                    link.href = url;
+                    link.classList.remove('hidden');
+                });
+            };
+
+            bindPreview('fotoCreateInput', 'fotoCreateLink', 'fotoCreatePreview');
+            bindPreview('fotoUpdateInput', 'fotoUpdateLink', 'fotoUpdatePreview');
+        })();
     </script>
 
 </body>
