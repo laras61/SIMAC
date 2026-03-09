@@ -477,8 +477,9 @@
                         <div class="label">Tanggal</div><div>${escapeHtml(data.tanggal_perbaikan ?? '-')}</div>
                         <div class="label">Aset</div><div>${escapeHtml(aset)}</div>
                         <div class="label">Jenis Perbaikan</div><div>${escapeHtml(data.jenis_perbaikan ?? '-')}</div>
-                        <div class="label">Teknisi</div><div>${escapeHtml(data.user?.nama ?? '-')}</div>
+                        <div class="label">Staff</div><div>${escapeHtml(data.user?.nama ?? '-')}</div>
                         <div class="label">Vendor</div><div>${escapeHtml(data.vendor?.nama_vendor ?? '-')}</div>
+                        <div class="label">PIC Vendor</div><div>${escapeHtml(data.vendor?.pic_nama ?? '-')}</div>
                         <div class="label">Status</div><div>${escapeHtml(data.status ?? '-')}</div>
                         <div class="label">Biaya</div><div>${escapeHtml(data.biaya !== null ? 'Rp ' + toRupiah(data.biaya) : '-')}</div>
                         <div class="label">Deskripsi</div><div>${escapeHtml(data.deskripsi ?? '-')}</div>
