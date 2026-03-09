@@ -69,7 +69,7 @@
                 <h3 class="font-bold text-teal-800">Input Maintenance</h3>
             </div>
             <div class="p-6">
-                <form action="{{ route('maintenance.insert') }}" method="POST">
+                <form action="{{ route('maintenance.insert') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -123,6 +123,14 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Catatan <span class="text-red-500">*</span></label>
                             <textarea name="catatan" required rows="3" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Tuliskan catatan pengerjaan..."></textarea>
                         </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                            <input id="fotoCreateInput" type="file" name="foto" accept="image/jpeg,image/png,image/jpg" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-teal-500 focus:border-teal-500">
+                            <a id="fotoCreateLink" href="#" target="_blank" rel="noopener" class="hidden mt-3 inline-block">
+                                <img id="fotoCreatePreview" src="" alt="Preview foto" class="h-32 w-auto rounded-lg border border-gray-200">
+                            </a>
+                        </div>
                     </div>
 
                     <div class="mt-4 flex justify-end">
@@ -157,6 +165,8 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Dikerjakan</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
@@ -187,9 +197,21 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                                     @endif
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $item->tanggal_dikerjakan ? \Carbon\Carbon::parse($item->tanggal_dikerjakan)->format('d M Y') : '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($item->foto)
+                                        <a href="{{ url('/files/' . $item->foto) }}" target="_blank" rel="noopener">
+                                            <img src="{{ url('/files/' . $item->foto) }}" alt="Foto" class="h-10 w-10 object-cover rounded border border-gray-200">
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     @if($item->status != 'selesai')
-                                        <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}')" 
+                                        <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}', '{{ addslashes($item->foto) }}')" 
                                             class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
                                             Update Status
                                         </button>
@@ -218,7 +240,7 @@
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form id="updateForm" method="POST" action="">
+                <form id="updateForm" method="POST" action="" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
                     
@@ -267,6 +289,14 @@
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dikerjakan</label>
                                             <input type="date" name="tanggal_dikerjakan" id="modalTanggalDikerjakan" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md border">
                                         </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                                            <input id="fotoUpdateInput" type="file" name="foto" accept="image/jpeg,image/png,image/jpg" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md border">
+                                            <a id="fotoUpdateLink" href="#" target="_blank" rel="noopener" class="hidden mt-3 inline-block">
+                                                <img id="fotoUpdatePreview" src="" alt="Preview foto" class="h-32 w-auto rounded-lg border border-gray-200">
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -308,7 +338,7 @@
     @endif
 
     <script>
-        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan) {
+        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan, fotoPath) {
             const modal = document.getElementById('updateModal');
             const form = document.getElementById('updateForm');
             const asestNameSpan = document.getElementById('modalAsetName');
@@ -316,6 +346,8 @@
             const vendorSelect = document.getElementById('modalVendor');
             const catatanInput = document.getElementById('modalCatatan');
             const tanggalInput = document.getElementById('modalTanggalDikerjakan');
+            const fotoLink = document.getElementById('fotoUpdateLink');
+            const fotoPreview = document.getElementById('fotoUpdatePreview');
             
             // Set action URL dynamically
             form.action = `/maintenance/update/${id}`;
@@ -339,6 +371,19 @@
             if (tanggalInput) {
                 tanggalInput.value = tanggalDikerjakan || '';
             }
+
+            if (fotoLink && fotoPreview) {
+                if (fotoPath) {
+                    const url = `{{ url('/files') }}/${fotoPath}`;
+                    fotoPreview.src = url;
+                    fotoLink.href = url;
+                    fotoLink.classList.remove('hidden');
+                } else {
+                    fotoPreview.src = '';
+                    fotoLink.href = '#';
+                    fotoLink.classList.add('hidden');
+                }
+            }
             
             modal.classList.remove('hidden');
         }
@@ -347,6 +392,31 @@
             const modal = document.getElementById('updateModal');
             modal.classList.add('hidden');
         }
+
+        (function initFotoPreview() {
+            const bindPreview = (inputId, linkId, imgId) => {
+                const input = document.getElementById(inputId);
+                const link = document.getElementById(linkId);
+                const img = document.getElementById(imgId);
+                if (!input || !link || !img) return;
+                input.addEventListener('change', function () {
+                    const file = input.files && input.files[0];
+                    if (!file) {
+                        img.src = '';
+                        link.href = '#';
+                        link.classList.add('hidden');
+                        return;
+                    }
+                    const url = URL.createObjectURL(file);
+                    img.src = url;
+                    link.href = url;
+                    link.classList.remove('hidden');
+                });
+            };
+
+            bindPreview('fotoCreateInput', 'fotoCreateLink', 'fotoCreatePreview');
+            bindPreview('fotoUpdateInput', 'fotoUpdateLink', 'fotoUpdatePreview');
+        })();
     </script>
 
 </body>

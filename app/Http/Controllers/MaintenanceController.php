@@ -114,6 +114,7 @@ class MaintenanceController extends Controller
             'jenis' => ['required', Rule::in(['preventive', 'corrective'])],
             'catatan' => 'required|string',
             'status' => ['required', Rule::in(['pending', 'proses', 'selesai'])],
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($validated['status'] === 'selesai' && empty($validated['tanggal_dikerjakan'])) {
@@ -124,7 +125,7 @@ class MaintenanceController extends Controller
             $validated['tanggal_dikerjakan'] = null;
         }
 
-        Maintenance::create([
+        $maintenance = Maintenance::create([
             'id_ac' => $validated['id_ac'],
             'id_user' => $user->id_user,
             'id_vendor' => $validated['id_vendor'] ?? null,
@@ -134,6 +135,10 @@ class MaintenanceController extends Controller
             'catatan' => $validated['catatan'],
             'status' => $validated['status'],
         ]);
+
+        if ($request->hasFile('foto')) {
+            $maintenance->uploadFoto($request->file('foto'));
+        }
 
         return redirect()
             ->route('maintenance.index')
@@ -185,6 +190,7 @@ class MaintenanceController extends Controller
                 $maintenance->uploadFoto($request->file('foto'));
             }
             
+            unset($validated['foto']);
             $maintenance->update($validated);
             
             return redirect()->route('maintenance.index')->with('success', 'Status maintenance berhasil diperbarui.');
@@ -218,6 +224,7 @@ class MaintenanceController extends Controller
             $maintenance->uploadFoto($request->file('foto'));
         }
 
+        unset($validated['foto']);
         $maintenance->update($validated);
 
         return redirect()->route('maintenance.index')->with('success', 'Data maintenance berhasil diperbarui.');

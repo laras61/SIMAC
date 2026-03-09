@@ -10,6 +10,8 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -70,3 +72,21 @@ Route::post('/vendor/insert', [VendorController::class, 'insert'])->name('vendor
 Route::get('/vendor/{vendor}', [VendorController::class, 'show'])->name('vendor.show');
 Route::match(['put', 'patch'], '/vendor/update/{vendor}', [VendorController::class, 'update'])->name('vendor.update');
 Route::delete('/vendor/delete/{vendor}', [VendorController::class, 'destroy'])->name('vendor.destroy');
+
+// Fallback file serving for storage if symlink isn't accessible (prevents 403)
+Route::get('/storage/{path}', function (string $path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (! file_exists($fullPath)) {
+        abort(404);
+    }
+    return Response::file($fullPath);
+})->where('path', '.*');
+
+// Alternate public endpoint to ALWAYS proxy files through Laravel, avoiding static server 403
+Route::get('/files/{path}', function (string $path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (! file_exists($fullPath)) {
+        abort(404);
+    }
+    return Response::file($fullPath);
+})->where('path', '.*');

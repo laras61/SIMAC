@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Perbaikan extends Model
 {
@@ -46,18 +47,18 @@ class Perbaikan extends Model
     {
         if ($file) {
             // Hapus foto lama jika ada
-            if ($this->foto && file_exists(storage_path('app/public/' . $this->foto))) {
-                unlink(storage_path('app/public/' . $this->foto));
+            if ($this->foto && Storage::disk('public')->exists($this->foto)) {
+                Storage::disk('public')->delete($this->foto);
             }
             
             // Simpan foto baru
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs('public/' . $path, $filename);
+            $filePath = $file->storeAs($path, $filename, 'public');
             
             // Update path di database
-            $this->update(['foto' => str_replace('public/', '', $filePath)]);
+            $this->update(['foto' => $filePath]);
             
-            return str_replace('public/', '', $filePath);
+            return $filePath;
         }
         
         return null;
@@ -66,8 +67,8 @@ class Perbaikan extends Model
     // Method untuk hapus foto
     public function deleteFoto()
     {
-        if ($this->foto && file_exists(storage_path('app/public/' . $this->foto))) {
-            unlink(storage_path('app/public/' . $this->foto));
+        if ($this->foto && Storage::disk('public')->exists($this->foto)) {
+            Storage::disk('public')->delete($this->foto);
             $this->update(['foto' => null]);
         }
     }

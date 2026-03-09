@@ -56,7 +56,7 @@
                 </h3>
             </div>
             <div class="p-6">
-                <form id="laporForm" action="{{ route('perbaikan.insert') }}" method="POST">
+                <form id="laporForm" action="{{ route('perbaikan.insert') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="status" value="baru">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -99,6 +99,13 @@
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Detail <span class="text-red-500">*</span></label>
                             <textarea name="deskripsi" required rows="2" placeholder="Jelaskan kondisi kerusakan..." class="w-full rounded-lg border-gray-300 border p-2 focus:ring-orange-500 focus:border-orange-500"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                            <input id="fotoCreateInput" type="file" name="foto" accept="image/jpeg,image/png,image/jpg" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-orange-500 focus:border-orange-500">
+                            <a id="fotoCreateLink" href="#" target="_blank" rel="noopener" class="hidden mt-3 inline-block">
+                                <img id="fotoCreatePreview" src="" alt="Preview foto" class="h-32 w-auto rounded-lg border border-gray-200">
+                            </a>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-end">
@@ -144,6 +151,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aset AC</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kerusakan</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Biaya</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -169,6 +177,15 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ optional($item->vendor)->nama_vendor ?? '-' }}
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($item->foto)
+                                        <a href="{{ url('/files/' . $item->foto) }}" target="_blank" rel="noopener">
+                                            <img src="{{ url('/files/' . $item->foto) }}" alt="Foto" class="h-10 w-10 object-cover rounded border border-gray-200">
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     @if($item->biaya)
                                         Rp {{ number_format($item->biaya, 0, ',', '.') }}
@@ -187,7 +204,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     @if($item->status != 'selesai')
-                                        <button onclick="openUpdateModal('{{ $item->id_perbaikan }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->tanggal_perbaikan }}', '{{ $item->biaya }}', '{{ addslashes($item->deskripsi) }}', '{{ $item->id_vendor }}')" 
+                                        <button onclick="openUpdateModal('{{ $item->id_perbaikan }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->tanggal_perbaikan }}', '{{ $item->biaya }}', '{{ addslashes($item->deskripsi) }}', '{{ $item->id_vendor }}', '{{ addslashes($item->foto) }}')" 
                                             class="text-orange-600 hover:text-orange-900 font-bold text-sm bg-orange-50 px-3 py-1 rounded-md border border-orange-200">
                                             Update
                                         </button>
@@ -214,7 +231,7 @@
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form id="updateForm" method="POST" action="">
+                <form id="updateForm" method="POST" action="" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
                     
@@ -262,6 +279,14 @@
                                                     <option value="{{ $vendor->id_vendor }}">{{ $vendor->nama_vendor }}</option>
                                                 @endforeach
                                             </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto</label>
+                                            <input id="fotoUpdateInput" type="file" name="foto" accept="image/jpeg,image/png,image/jpg" class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm border p-2">
+                                            <a id="fotoUpdateLink" href="#" target="_blank" rel="noopener" class="hidden mt-3 inline-block">
+                                                <img id="fotoUpdatePreview" src="" alt="Preview foto" class="h-32 w-auto rounded-lg border border-gray-200">
+                                            </a>
                                         </div>
 
                                         <div>
@@ -352,7 +377,7 @@
             }
         });
 
-        function openUpdateModal(id, asetName, status, tanggalPerbaikan, biaya, deskripsi, vendorId) {
+        function openUpdateModal(id, asetName, status, tanggalPerbaikan, biaya, deskripsi, vendorId, fotoPath) {
             document.getElementById('updateModal').classList.remove('hidden');
             document.getElementById('updateForm').action = `/perbaikan/update/${id}`;
             document.getElementById('modalAsetName').textContent = asetName;
@@ -360,6 +385,21 @@
             document.getElementById('modalDeskripsi').value = deskripsi;
             document.getElementById('modalVendor').value = vendorId || '';
             document.getElementById('modalTanggalPerbaikan').value = tanggalPerbaikan || '';
+
+            const fotoLink = document.getElementById('fotoUpdateLink');
+            const fotoPreview = document.getElementById('fotoUpdatePreview');
+            if (fotoLink && fotoPreview) {
+                if (fotoPath) {
+                    const url = `{{ url('/files') }}/${fotoPath}`;
+                    fotoPreview.src = url;
+                    fotoLink.href = url;
+                    fotoLink.classList.remove('hidden');
+                } else {
+                    fotoPreview.src = '';
+                    fotoLink.href = '#';
+                    fotoLink.classList.add('hidden');
+                }
+            }
             
             if (biaya) {
                 modalBiayaActual.value = biaya;
@@ -373,6 +413,31 @@
         function closeUpdateModal() {
             document.getElementById('updateModal').classList.add('hidden');
         }
+
+        (function initFotoPreview() {
+            const bindPreview = (inputId, linkId, imgId) => {
+                const input = document.getElementById(inputId);
+                const link = document.getElementById(linkId);
+                const img = document.getElementById(imgId);
+                if (!input || !link || !img) return;
+                input.addEventListener('change', function () {
+                    const file = input.files && input.files[0];
+                    if (!file) {
+                        img.src = '';
+                        link.href = '#';
+                        link.classList.add('hidden');
+                        return;
+                    }
+                    const url = URL.createObjectURL(file);
+                    img.src = url;
+                    link.href = url;
+                    link.classList.remove('hidden');
+                });
+            };
+
+            bindPreview('fotoCreateInput', 'fotoCreateLink', 'fotoCreatePreview');
+            bindPreview('fotoUpdateInput', 'fotoUpdateLink', 'fotoUpdatePreview');
+        })();
     </script>
 </body>
 </html>

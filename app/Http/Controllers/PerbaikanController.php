@@ -170,6 +170,7 @@ class PerbaikanController extends Controller
                 $perbaikan->uploadFoto($request->file('foto'));
             }
 
+            unset($validated['foto']);
             $perbaikan->update($validated);
             
             return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil diperbarui.');
