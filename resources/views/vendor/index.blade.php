@@ -83,7 +83,6 @@
 <body>
     @include('partials.nav')
     @php
-        $layananOptions = ['maintenance', 'perbaikan'];
         $statusOptions = ['aktif', 'nonaktif'];
     @endphp
     <div class="wrap">
@@ -107,22 +106,12 @@
                                 <input id="no_hp" type="text" name="no_hp" value="{{ old('no_hp', $editItem->no_hp) }}">
                             </div>
                             <div class="field">
-                                <label for="id_user">User PIC Internal</label>
-                                <select id="id_user" name="id_user">
-                                    <option value="">-</option>
-                                    @foreach ($listUsers as $user)
-                                        <option value="{{ $user->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $user->id_user ? 'selected' : '' }}>{{ $user->nama }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="pic_nama">PIC Vendor</label>
+                                <input id="pic_nama" type="text" name="pic_nama" value="{{ old('pic_nama', $editItem->pic_nama) }}">
                             </div>
                             <div class="field">
-                                <label for="layanan">Layanan</label>
-                                @php $layananEdit = old('layanan', $editItem->layanan); @endphp
-                                <select id="layanan" name="layanan" required>
-                                    @foreach ($layananOptions as $layanan)
-                                        <option value="{{ $layanan }}" {{ $layananEdit === $layanan ? 'selected' : '' }}>{{ $layanan }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="pic_no_hp">No HP PIC Vendor</label>
+                                <input id="pic_no_hp" type="text" name="pic_no_hp" value="{{ old('pic_no_hp', $editItem->pic_no_hp) }}">
                             </div>
                             <div class="field">
                                 <label for="status">Status</label>
@@ -159,7 +148,7 @@
                 <form method="GET" action="{{ route('vendor.index') }}" class="filter-form" id="vendorFilterForm">
                     <div class="field">
                         <label for="q">Pencarian</label>
-                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Nama vendor, PIC, email, layanan">
+                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Nama vendor, PIC vendor, email, no hp">
                     </div>
                     <div class="field">
                         <label for="status_filter">Filter Status</label>
@@ -177,9 +166,8 @@
                             <th>No</th>
                             <th>Nama Vendor</th>
                             <th>Kontak</th>
-                            <th>Layanan</th>
+                            <th>PIC Vendor</th>
                             <th>Status</th>
-                            <th>User Internal</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -189,9 +177,8 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $row->nama_vendor }}</td>
                                 <td>{{ $row->email ?: '-' }} / {{ $row->no_hp ?: '-' }}</td>
-                                <td>{{ $row->layanan ?: '-' }}</td>
+                                <td>{{ $row->pic_nama ?: '-' }} / {{ $row->pic_no_hp ?: '-' }}</td>
                                 <td>{{ $row->status }}</td>
-                                <td>{{ optional($row->user)->nama ?: '-' }}</td>
                                 <td>
                                     <div class="row-actions">
                                         <a href="{{ route('vendor.index', array_merge(request()->only(['q', 'status']), ['edit' => $row->id_vendor])) }}" class="btn btn-warning">Edit</a>
@@ -204,7 +191,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="8">Belum ada data.</td></tr>
+                            <tr><td colspan="6">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -234,22 +221,12 @@
                         <input id="add_no_hp" type="text" name="no_hp" value="{{ old('no_hp') }}">
                     </div>
                     <div class="field">
-                        <label for="add_id_user">User PIC Internal</label>
-                        <select id="add_id_user" name="id_user">
-                            <option value="">-</option>
-                            @foreach ($listUsers as $user)
-                                <option value="{{ $user->id_user }}" {{ (string) old('id_user') === (string) $user->id_user ? 'selected' : '' }}>{{ $user->nama }}</option>
-                            @endforeach
-                        </select>
+                        <label for="add_pic_nama">PIC Vendor</label>
+                        <input id="add_pic_nama" type="text" name="pic_nama" value="{{ old('pic_nama') }}">
                     </div>
                     <div class="field">
-                        <label for="add_layanan">Layanan</label>
-                        @php $layananTambah = old('layanan', 'maintenance'); @endphp
-                        <select id="add_layanan" name="layanan" required>
-                            @foreach ($layananOptions as $layanan)
-                                <option value="{{ $layanan }}" {{ $layananTambah === $layanan ? 'selected' : '' }}>{{ $layanan }}</option>
-                            @endforeach
-                        </select>
+                        <label for="add_pic_no_hp">No HP PIC Vendor</label>
+                        <input id="add_pic_no_hp" type="text" name="pic_no_hp" value="{{ old('pic_no_hp') }}">
                     </div>
                     <div class="field">
                         <label for="add_status">Status</label>

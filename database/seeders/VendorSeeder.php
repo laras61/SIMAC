@@ -9,18 +9,14 @@ class VendorSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = \App\Models\User::where('email', 'admin@simac.com')->first();
-        $teknisi = \App\Models\User::where('email', 'budi@simac.com')->first();
-        $staff = \App\Models\User::where('email', 'siti@simac.com')->first();
-
         Vendor::updateOrCreate(
             ['email' => 'vendor.sejuk@simac.com'],
             [
             'nama_vendor' => 'PT Sejuk Sentosa',
             'no_hp' => '081200000001',
             'alamat' => 'Jakarta',
-            'id_user' => optional($admin)->id_user,
-            'layanan' => 'perbaikan',
+            'pic_nama' => 'Bapak Andi',
+            'pic_no_hp' => '081200000101',
             'status' => 'aktif',
             'catatan' => 'Spesialis AC split dan cassette',
         ]);
@@ -31,8 +27,8 @@ class VendorSeeder extends Seeder
             'nama_vendor' => 'CV Dingin Jaya',
             'no_hp' => '081200000002',
             'alamat' => 'Bogor',
-            'id_user' => optional($teknisi)->id_user,
-            'layanan' => 'perbaikan',
+            'pic_nama' => 'Ibu Rina',
+            'pic_no_hp' => '081200000102',
             'status' => 'aktif',
             'catatan' => null,
         ]);
@@ -43,8 +39,8 @@ class VendorSeeder extends Seeder
             'nama_vendor' => 'UD Service Mandiri',
             'no_hp' => '081200000003',
             'alamat' => 'Depok',
-            'id_user' => optional($staff)->id_user,
-            'layanan' => 'perbaikan',
+            'pic_nama' => 'Mas Dedi',
+            'pic_no_hp' => '081200000103',
             'status' => 'nonaktif',
             'catatan' => 'Tidak menerima panggilan luar kota',
         ]);

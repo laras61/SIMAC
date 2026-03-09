@@ -17,14 +17,9 @@ class Vendor extends Model
         'email',
         'no_hp',
         'alamat',
-        'id_user',
-        'layanan',
+        'pic_nama',
+        'pic_no_hp',
         'status',
         'catatan',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'id_user', 'id_user');
-    }
 }
