@@ -51,8 +51,6 @@ class PerbaikanController extends Controller
 
         $items = $itemsQuery->latest('id_perbaikan')->get();
         $listVendors = Vendor::query()
-            ->where('layanan', 'perbaikan')
-            ->where('status', 'aktif')
             ->select('id_vendor', 'nama_vendor')
             ->orderBy('nama_vendor')
             ->get();
@@ -85,9 +83,6 @@ class PerbaikanController extends Controller
         
         $listBarang = Barang::select('id_ac', 'kode_bmn', 'merk', 'lokasi')->get();
         $listVendors = Vendor::query()
-            ->where('id_user', $userId)
-            ->where('layanan', 'perbaikan')
-            ->where('status', 'aktif')
             ->select('id_vendor', 'nama_vendor')
             ->orderBy('nama_vendor')
             ->get();
@@ -112,16 +107,7 @@ class PerbaikanController extends Controller
             'jenis_perbaikan' => 'required|string',
             'deskripsi' => 'nullable|string',
             'id_user' => 'required|exists:users,id_user',
-            'id_vendor' => [
-                'nullable',
-                Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
-                    if ($user && in_array($user->role, ['staff', 'pic'], true)) {
-                        $q->where('id_user', $user->id_user);
-                    }
-                    $q->where('layanan', 'perbaikan')
-                      ->where('status', 'aktif');
-                }),
-            ],
+            'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'biaya' => 'nullable|numeric',
             'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
         ]);
@@ -167,14 +153,7 @@ class PerbaikanController extends Controller
             $validated = $request->validate([
                 'status' => ['required', Rule::in(['baru', 'proses', 'selesai'])],
                 'tanggal_perbaikan' => 'required|date',
-                'id_vendor' => [
-                    'nullable',
-                    Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
-                        $q->where('id_user', $user->id_user)
-                          ->where('layanan', 'perbaikan')
-                          ->where('status', 'aktif');
-                    }),
-                ],
+                'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
                 'biaya' => 'nullable|numeric',
                 'deskripsi' => 'nullable|string',
             ]);
