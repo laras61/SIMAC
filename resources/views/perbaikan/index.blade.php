@@ -118,6 +118,15 @@
                                 <input id="jenis_perbaikan" type="text" name="jenis_perbaikan" value="{{ old('jenis_perbaikan', $editItem->jenis_perbaikan) }}" required>
                             </div>
                             <div class="field">
+                                <label for="id_vendor">Vendor</label>
+                                <select id="id_vendor" name="id_vendor">
+                                    <option value="">-</option>
+                                    @foreach ($listVendors as $vendor)
+                                        <option value="{{ $vendor->id_vendor }}" {{ (string) old('id_vendor', $editItem->id_vendor) === (string) $vendor->id_vendor ? 'selected' : '' }}>{{ $vendor->nama_vendor }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="field">
                                 <label for="biaya">Biaya</label>
                                 <input id="biaya" type="number" name="biaya" value="{{ old('biaya', $editItem->biaya) }}" min="0" step="0.01">
                             </div>
@@ -172,6 +181,7 @@
                             <th>Barang</th>
                             <th>Jenis</th>
                             <th>Teknisi</th>
+                            <th>Vendor</th>
                             <th>Biaya</th>
                             <th>Status</th>
                             <th>Deskripsi</th>
@@ -186,6 +196,7 @@
                                 <td>{{ optional($row->barang)->kode_bmn ?? '-' }} - {{ optional($row->barang)->merk ?? '-' }}</td>
                                 <td>{{ $row->jenis_perbaikan }}</td>
                                 <td>{{ optional($row->user)->nama ?? '-' }}</td>
+                                <td>{{ optional($row->vendor)->nama_vendor ?? '-' }}</td>
                                 <td>{{ $row->biaya !== null ? number_format((float) $row->biaya, 0, ',', '.') : '-' }}</td>
                                 <td>{{ $row->status ?? '-' }}</td>
                                 <td>{{ $row->deskripsi ?: '-' }}</td>
@@ -201,7 +212,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9">Belum ada data.</td></tr>
+                            <tr><td colspan="10">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -243,6 +254,15 @@
                     <div class="field">
                         <label for="add_jenis_perbaikan">Jenis Perbaikan</label>
                         <input id="add_jenis_perbaikan" type="text" name="jenis_perbaikan" value="{{ old('jenis_perbaikan') }}" required>
+                    </div>
+                    <div class="field">
+                        <label for="add_id_vendor">Vendor</label>
+                        <select id="add_id_vendor" name="id_vendor">
+                            <option value="">-</option>
+                            @foreach ($listVendors as $vendor)
+                                <option value="{{ $vendor->id_vendor }}" {{ (string) old('id_vendor') === (string) $vendor->id_vendor ? 'selected' : '' }}>{{ $vendor->nama_vendor }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="field">
                         <label for="add_biaya">Biaya</label>

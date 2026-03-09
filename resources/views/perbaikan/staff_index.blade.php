@@ -78,6 +78,15 @@
                             <input type="text" name="jenis_perbaikan" required placeholder="Contoh: AC Bocor, Tidak Dingin" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-orange-500 focus:border-orange-500">
                         </div>
                         <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                            <select name="id_vendor" class="w-full rounded-lg border-gray-300 border p-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">-</option>
+                                @foreach($listVendors as $vendor)
+                                    <option value="{{ $vendor->id_vendor }}">{{ $vendor->nama_vendor }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Estimasi Biaya</label>
                             <div class="relative rounded-md shadow-sm">
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -134,6 +143,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aset AC</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kerusakan</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Biaya</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -156,6 +166,9 @@
                                     <div class="text-sm font-medium text-gray-900">{{ $item->jenis_perbaikan }}</div>
                                     <div class="text-xs text-gray-500 line-clamp-1">{{ $item->deskripsi }}</div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ optional($item->vendor)->nama_vendor ?? '-' }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     @if($item->biaya)
                                         Rp {{ number_format($item->biaya, 0, ',', '.') }}
@@ -174,7 +187,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     @if($item->status != 'selesai')
-                                        <button onclick="openUpdateModal('{{ $item->id_perbaikan }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->biaya }}', '{{ addslashes($item->deskripsi) }}')" 
+                                        <button onclick="openUpdateModal('{{ $item->id_perbaikan }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->tanggal_perbaikan }}', '{{ $item->biaya }}', '{{ addslashes($item->deskripsi) }}', '{{ $item->id_vendor }}')" 
                                             class="text-orange-600 hover:text-orange-900 font-bold text-sm bg-orange-50 px-3 py-1 rounded-md border border-orange-200">
                                             Update
                                         </button>
@@ -234,6 +247,21 @@
                                                 <input type="text" id="modal_biaya_display" class="block w-full rounded-md border-gray-300 pl-10 focus:border-orange-500 focus:ring-orange-500 sm:text-sm p-2 border" placeholder="0">
                                                 <input type="hidden" name="biaya" id="modal_biaya_actual">
                                             </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Perbaikan <span class="text-red-500">*</span></label>
+                                            <input type="date" name="tanggal_perbaikan" id="modalTanggalPerbaikan" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm border p-2">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                                            <select name="id_vendor" id="modalVendor" class="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm border p-2">
+                                                <option value="">-</option>
+                                                @foreach($listVendors as $vendor)
+                                                    <option value="{{ $vendor->id_vendor }}">{{ $vendor->nama_vendor }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
                                         <div>
@@ -324,12 +352,14 @@
             }
         });
 
-        function openUpdateModal(id, asetName, status, biaya, deskripsi) {
+        function openUpdateModal(id, asetName, status, tanggalPerbaikan, biaya, deskripsi, vendorId) {
             document.getElementById('updateModal').classList.remove('hidden');
             document.getElementById('updateForm').action = `/perbaikan/update/${id}`;
             document.getElementById('modalAsetName').textContent = asetName;
             document.getElementById('modalStatus').value = status;
             document.getElementById('modalDeskripsi').value = deskripsi;
+            document.getElementById('modalVendor').value = vendorId || '';
+            document.getElementById('modalTanggalPerbaikan').value = tanggalPerbaikan || '';
             
             if (biaya) {
                 modalBiayaActual.value = biaya;

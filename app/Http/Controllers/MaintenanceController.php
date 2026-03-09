@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Maintenance;
 use App\Models\Barang;
 use App\Models\User;
+use App\Models\Vendor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -55,6 +56,12 @@ class MaintenanceController extends Controller
             ->orderBy('tanggal_jadwal')
             ->orderByDesc('id_maintenance')
             ->get();
+        $listVendors = Vendor::query()
+            ->where('layanan', 'maintenance')
+            ->where('status', 'aktif')
+            ->select('id_vendor', 'nama_vendor')
+            ->orderBy('nama_vendor')
+            ->get();
         $listPic = User::query()
             ->where('role', 'staff')
             ->select('id_user', 'nama')
@@ -66,18 +73,30 @@ class MaintenanceController extends Controller
             $editItem = Maintenance::with(['barang', 'user', 'vendor'])->find(request('edit'));
         }
 
-        return view('maintenance.index', compact('items', 'listPic', 'editItem', 'search', 'status'));
+        return view('maintenance.index', compact('items', 'listVendors', 'listPic', 'editItem', 'search', 'status'));
     }
 
     private function staffIndex()
     {
         $userId = auth()->id();
-        $items = Maintenance::with(['barang'])
+        $items = Maintenance::with(['barang', 'vendor'])
             ->where('id_user', $userId)
             ->orderBy('tanggal_jadwal', 'asc')
             ->get();
+
+        $listBarang = Barang::query()
+            ->select('id_ac', 'kode_bmn', 'merk', 'lokasi')
+            ->orderBy('kode_bmn')
+            ->get();
+        $listVendors = Vendor::query()
+            ->where('id_user', $userId)
+            ->where('layanan', 'maintenance')
+            ->where('status', 'aktif')
+            ->select('id_vendor', 'nama_vendor')
+            ->orderBy('nama_vendor')
+            ->get();
             
-        return view('maintenance.staff_index', compact('items'));
+        return view('maintenance.staff_index', compact('items', 'listBarang', 'listVendors'));
     }
 
     /**
@@ -85,9 +104,52 @@ class MaintenanceController extends Controller
      */
     public function insert(Request $request)
     {
+        $user = auth()->user();
+        if (! $user || ! in_array($user->role, ['staff', 'pic'], true)) {
+            return redirect()
+                ->route('maintenance.index')
+                ->with('error', 'Tambah maintenance hanya tersedia untuk Staff.');
+        }
+
+        $validated = $request->validate([
+            'id_ac' => 'required|exists:tbl_barang,id_ac',
+            'id_vendor' => [
+                'nullable',
+                Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
+                    $q->where('id_user', $user->id_user)
+                      ->where('layanan', 'maintenance')
+                      ->where('status', 'aktif');
+                }),
+            ],
+            'tanggal_jadwal' => 'required|date',
+            'tanggal_dikerjakan' => 'nullable|date',
+            'jenis' => ['required', Rule::in(['preventive', 'corrective'])],
+            'catatan' => 'required|string',
+            'status' => ['required', Rule::in(['pending', 'proses', 'selesai'])],
+        ]);
+
+        if ($validated['status'] === 'selesai' && empty($validated['tanggal_dikerjakan'])) {
+            $validated['tanggal_dikerjakan'] = Carbon::today()->format('Y-m-d');
+        }
+
+        if ($validated['status'] === 'proses') {
+            $validated['tanggal_dikerjakan'] = null;
+        }
+
+        Maintenance::create([
+            'id_ac' => $validated['id_ac'],
+            'id_user' => $user->id_user,
+            'id_vendor' => $validated['id_vendor'] ?? null,
+            'tanggal_jadwal' => $validated['tanggal_jadwal'],
+            'tanggal_dikerjakan' => $validated['tanggal_dikerjakan'] ?? null,
+            'jenis' => $validated['jenis'],
+            'catatan' => $validated['catatan'],
+            'status' => $validated['status'],
+        ]);
+
         return redirect()
             ->route('maintenance.index')
-            ->with('error', 'Tambah maintenance manual dinonaktifkan. Jadwal dibuat otomatis dari data barang.');
+            ->with('success', 'Data maintenance berhasil ditambahkan.');
     }
 
     /**
@@ -114,8 +176,16 @@ class MaintenanceController extends Controller
             }
 
             $validated = $request->validate([
-                'status' => 'required|in:proses,selesai',
-                'catatan' => 'nullable|string',
+                'status' => ['required', Rule::in(['pending', 'proses', 'selesai'])],
+                'id_vendor' => [
+                    'nullable',
+                    Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
+                        $q->where('id_user', $user->id_user)
+                          ->where('layanan', 'maintenance')
+                          ->where('status', 'aktif');
+                    }),
+                ],
+                'catatan' => 'required|string',
                 'tanggal_dikerjakan' => 'nullable|date',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
@@ -123,6 +193,10 @@ class MaintenanceController extends Controller
             // Jika status selesai tapi tanggal kosong, isi hari ini
             if ($validated['status'] === 'selesai' && empty($validated['tanggal_dikerjakan'])) {
                 $validated['tanggal_dikerjakan'] = Carbon::today()->format('Y-m-d');
+            }
+
+            if (in_array($validated['status'], ['pending', 'proses'], true)) {
+                $validated['tanggal_dikerjakan'] = null;
             }
             
             // Handle upload foto
@@ -154,7 +228,7 @@ class MaintenanceController extends Controller
             $validated['tanggal_dikerjakan'] = Carbon::today()->format('Y-m-d');
         }
 
-        if ($validated['status'] === 'proses') {
+        if (in_array($validated['status'], ['pending', 'proses'], true)) {
             $validated['tanggal_dikerjakan'] = null;
         }
 
