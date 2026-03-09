@@ -110,10 +110,11 @@ class PerbaikanController extends Controller
             'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'biaya' => 'nullable|numeric',
             'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         // Menyimpan data perbaikan
-        Perbaikan::create([
+        $perbaikan = Perbaikan::create([
             'id_ac' => $validated['id_ac'],
             'tanggal_perbaikan' => $validated['tanggal_perbaikan'],
             'jenis_perbaikan' => $validated['jenis_perbaikan'],
@@ -123,6 +124,11 @@ class PerbaikanController extends Controller
             'biaya' => $validated['biaya'] ?? null,
             'status' => $validated['status'] ?? 'baru',
         ]);
+
+        // Handle upload foto
+        if ($request->hasFile('foto')) {
+            $perbaikan->uploadFoto($request->file('foto'));
+        }
 
         return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil ditambahkan.');
     }
@@ -156,7 +162,13 @@ class PerbaikanController extends Controller
                 'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
                 'biaya' => 'nullable|numeric',
                 'deskripsi' => 'nullable|string',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
+
+            // Handle upload foto
+            if ($request->hasFile('foto')) {
+                $perbaikan->uploadFoto($request->file('foto'));
+            }
 
             $perbaikan->update($validated);
             
@@ -173,6 +185,7 @@ class PerbaikanController extends Controller
             'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'biaya' => 'nullable|numeric',
             'status' => ['nullable', Rule::in(['baru', 'proses', 'selesai'])],
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         // Update data perbaikan
@@ -187,6 +200,11 @@ class PerbaikanController extends Controller
             'status' => $validated['status'] ?? $perbaikan->status,
         ]);
 
+        // Handle upload foto
+        if ($request->hasFile('foto')) {
+            $perbaikan->uploadFoto($request->file('foto'));
+        }
+
         return redirect()->route('perbaikan.index')->with('success', 'Data perbaikan berhasil diperbarui.');
     }
 
@@ -195,6 +213,11 @@ class PerbaikanController extends Controller
      */
     public function destroy(Perbaikan $perbaikan)
     {
+        // Hapus foto jika ada
+        if ($perbaikan->foto) {
+            $perbaikan->deleteFoto();
+        }
+        
         // Hapus data perbaikan
         $perbaikan->delete();
 

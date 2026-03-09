@@ -168,6 +168,7 @@ class MaintenanceController extends Controller
                 'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
                 'catatan' => 'required|string',
                 'tanggal_dikerjakan' => 'nullable|date',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
             // Jika status selesai tapi tanggal kosong, isi hari ini
@@ -177,6 +178,11 @@ class MaintenanceController extends Controller
 
             if (in_array($validated['status'], ['pending', 'proses'], true)) {
                 $validated['tanggal_dikerjakan'] = null;
+            }
+            
+            // Handle upload foto
+            if ($request->hasFile('foto')) {
+                $maintenance->uploadFoto($request->file('foto'));
             }
             
             $maintenance->update($validated);
@@ -196,6 +202,7 @@ class MaintenanceController extends Controller
             'tanggal_dikerjakan' => 'nullable|date',
             'catatan' => 'nullable|string',
             'status' => 'required|in:proses,selesai',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($validated['status'] === 'selesai' && empty($validated['tanggal_dikerjakan'])) {
@@ -204,6 +211,11 @@ class MaintenanceController extends Controller
 
         if (in_array($validated['status'], ['pending', 'proses'], true)) {
             $validated['tanggal_dikerjakan'] = null;
+        }
+
+        // Handle upload foto
+        if ($request->hasFile('foto')) {
+            $maintenance->uploadFoto($request->file('foto'));
         }
 
         $maintenance->update($validated);
@@ -216,6 +228,11 @@ class MaintenanceController extends Controller
      */
     public function destroy(Maintenance $maintenance)
     {
+        // Hapus foto jika ada
+        if ($maintenance->foto) {
+            $maintenance->deleteFoto();
+        }
+        
         // Hapus data maintenance
         $maintenance->delete();
 
