@@ -6,11 +6,12 @@ use Carbon\Carbon;
 use App\Models\Barang;
 use App\Models\Perbaikan;
 use App\Models\Maintenance;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         if (in_array(Auth::user()->role, ['staff', 'pic', 'teknisi'])) {
             return redirect()->route('staff.dashboard');
@@ -20,8 +21,11 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        $daysAhead = (int) $request->query('days', 30);
+        $daysAhead = max(1, min($daysAhead, 365));
+
         $today = Carbon::today();
-        $nearDueLimit = $today->copy()->addDays(30);
+        $nearDueLimit = $today->copy()->addDays($daysAhead);
 
         $latestMaintenanceByAc = Maintenance::with('user:id_user,nama')
             ->whereNotNull('tanggal_dikerjakan')
@@ -63,13 +67,16 @@ class DashboardController extends Controller
             ->sortBy('next_due')
             ->values();
 
+        $sevenDaysAgo = $today->copy()->subDays(7);
+
         $repairHistories = Perbaikan::with('barang:id_ac,kode_bmn,lokasi')
+            ->whereBetween('tanggal_perbaikan', [$sevenDaysAgo->toDateString(), $today->toDateString()])
             ->orderByDesc('tanggal_perbaikan')
             ->orderByDesc('id_perbaikan')
-            ->take(10)
             ->get()
             ->map(function (Perbaikan $perbaikan) {
                 return [
+                    'id_perbaikan' => $perbaikan->id_perbaikan,
                     'tanggal' => $perbaikan->tanggal_perbaikan,
                     'aset' => ($perbaikan->barang->kode_bmn ?? '-') . ' / ' . ($perbaikan->barang->lokasi ?? '-'),
                     'keterangan' => $perbaikan->jenis_perbaikan . (! empty($perbaikan->deskripsi) ? ' | ' . $perbaikan->deskripsi : ''),
@@ -86,6 +93,7 @@ class DashboardController extends Controller
             'nearDueCount' => $nearDueCount,
             'maintenancePlans' => $maintenancePlans,
             'repairHistories' => $repairHistories,
+            'daysAhead' => $daysAhead,
         ]);
     }
 

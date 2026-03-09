@@ -63,6 +63,7 @@
         </div>
         @endif
 
+<<<<<<< HEAD
         <!-- Form Input Maintenance -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-gray-100 bg-teal-50">
@@ -142,6 +143,8 @@
             </div>
         </div>
 
+=======
+>>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                 <h3 class="font-bold text-gray-800">Daftar Tugas Maintenance</h3>
@@ -210,17 +213,51 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+<<<<<<< HEAD
                                     @if($item->status != 'selesai')
                                         <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}', '{{ addslashes($item->foto) }}')" 
                                             class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
                                             Update Status
+=======
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onclick="openDetailModal(this)"
+                                            data-kode-bmn="{{ $item->barang->kode_bmn }}"
+                                            data-merk="{{ $item->barang->merk }}"
+                                            data-lokasi="{{ $item->barang->lokasi }}"
+                                            data-tanggal-jadwal="{{ $item->tanggal_jadwal ? \Carbon\Carbon::parse($item->tanggal_jadwal)->format('Y-m-d') : '' }}"
+                                            data-tanggal-dikerjakan="{{ $item->tanggal_dikerjakan ? \Carbon\Carbon::parse($item->tanggal_dikerjakan)->format('Y-m-d') : '' }}"
+                                            data-jenis="{{ $item->jenis }}"
+                                            data-status="{{ $item->status }}"
+                                            data-catatan="{{ $item->catatan }}"
+                                            data-vendor-nama="{{ $item->vendor->nama_vendor ?? '' }}"
+                                            data-vendor-pic="{{ $item->vendor->pic_nama ?? '' }}"
+                                            data-vendor-no-hp="{{ $item->vendor->no_hp ?? '' }}"
+                                            data-vendor-email="{{ $item->vendor->email ?? '' }}"
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                                            title="Lihat detail maintenance"
+                                            aria-label="Lihat detail maintenance"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                                            </svg>
+>>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
                                         </button>
-                                    @else
-                                        <span class="text-gray-400 flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                            Tuntas
-                                        </span>
-                                    @endif
+
+                                        @if($item->status != 'selesai')
+                                            <button onclick="openUpdateModal('{{ $item->id_maintenance }}', '{{ $item->barang->kode_bmn }}', '{{ $item->status }}', '{{ $item->id_vendor }}', '{{ $item->tanggal_dikerjakan }}', '{{ addslashes($item->catatan) }}')" 
+                                                class="bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-900 px-3 py-1 rounded-md text-sm font-medium transition-colors border border-teal-200">
+                                                Update Status
+                                            </button>
+                                        @else
+                                            <span class="text-gray-400 flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                Tuntas
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -228,6 +265,80 @@
                     </table>
                 </div>
             @endif
+        </div>
+    </div>
+
+    <!-- Modal Detail Maintenance -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="detail-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDetailModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-5 pt-5 pb-4 sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <h3 class="text-lg leading-6 font-semibold text-gray-900" id="detail-modal-title">Detail Maintenance</h3>
+                        <button type="button" onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600" aria-label="Tutup detail">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-500">Aset</p>
+                            <p id="detailAset" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Lokasi</p>
+                            <p id="detailLokasi" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Tanggal Jadwal</p>
+                            <p id="detailTanggalJadwal" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Tanggal Dikerjakan</p>
+                            <p id="detailTanggalDikerjakan" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Jenis</p>
+                            <p id="detailJenis" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Status</p>
+                            <p id="detailStatus" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Vendor</p>
+                            <p id="detailVendor" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">PIC Vendor</p>
+                            <p id="detailVendorPic" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">No. HP Vendor</p>
+                            <p id="detailVendorNoHp" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Email Vendor</p>
+                            <p id="detailVendorEmail" class="font-medium text-gray-900">-</p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <p class="text-gray-500">Catatan</p>
+                            <p id="detailCatatan" class="font-medium text-gray-900 whitespace-pre-line">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3 text-right">
+                    <button type="button" onclick="closeDetailModal()" class="inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Tutup
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -338,7 +449,46 @@
     @endif
 
     <script>
+<<<<<<< HEAD
         function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan, fotoPath) {
+=======
+        function formatDateId(value) {
+            if (!value) return '-';
+
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function openDetailModal(button) {
+            const data = button.dataset;
+
+            document.getElementById('detailAset').textContent = [data.kodeBmn, data.merk].filter(Boolean).join(' - ') || '-';
+            document.getElementById('detailLokasi').textContent = data.lokasi || '-';
+            document.getElementById('detailTanggalJadwal').textContent = formatDateId(data.tanggalJadwal);
+            document.getElementById('detailTanggalDikerjakan').textContent = formatDateId(data.tanggalDikerjakan);
+            document.getElementById('detailJenis').textContent = data.jenis || '-';
+            document.getElementById('detailStatus').textContent = data.status || '-';
+            document.getElementById('detailVendor').textContent = data.vendorNama || '-';
+            document.getElementById('detailVendorPic').textContent = data.vendorPic || '-';
+            document.getElementById('detailVendorNoHp').textContent = data.vendorNoHp || '-';
+            document.getElementById('detailVendorEmail').textContent = data.vendorEmail || '-';
+            document.getElementById('detailCatatan').textContent = data.catatan || '-';
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function openUpdateModal(id, asetName, currentStatus, vendorId, tanggalDikerjakan, catatan) {
+>>>>>>> cc02da710237098173d777ae6d4cafbd9234a4c9
             const modal = document.getElementById('updateModal');
             const form = document.getElementById('updateForm');
             const asestNameSpan = document.getElementById('modalAsetName');

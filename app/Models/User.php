@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'no_hp',
         'role',
+        'foto_profi',
     ];
 
     /**
@@ -58,5 +59,27 @@ class User extends Authenticatable
     public function perbaikan()
     {
         return $this->hasMany(Perbaikan::class, 'id_user', 'id_user');
+    }
+
+    public function uploadFotoProfi($file, $path = 'users')
+    {
+        if ($file) {
+            if ($this->foto_profi && file_exists(storage_path('app/public/' . $this->foto_profi))) {
+                unlink(storage_path('app/public/' . $this->foto_profi));
+            }
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('public/' . $path, $filename);
+            $this->update(['foto_profi' => str_replace('public/', '', $filePath)]);
+            return str_replace('public/', '', $filePath);
+        }
+        return null;
+    }
+
+    public function deleteFotoProfi()
+    {
+        if ($this->foto_profi && file_exists(storage_path('app/public/' . $this->foto_profi))) {
+            unlink(storage_path('app/public/' . $this->foto_profi));
+            $this->update(['foto_profi' => null]);
+        }
     }
 }

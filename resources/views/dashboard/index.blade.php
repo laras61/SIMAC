@@ -146,6 +146,56 @@
             border-top: 3px solid #0f766e;
         }
         .panel h2 { margin: 0 0 10px; font-size: 16px; color: var(--primary-dark); }
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-days-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+        .filter-days-form input {
+            width: 72px;
+            padding: 6px 8px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+        }
+        .filter-days-form button {
+            border: 1px solid #0f766e;
+            background: #0f766e;
+            color: #fff;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .filter-days-form button:hover {
+            background: #115e59;
+            border-color: #115e59;
+        }
+        .btn-detail {
+            border: 1px solid #0f766e;
+            background: #ffffff;
+            color: #0f766e;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-detail:hover {
+            background: #f0fdfa;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -172,6 +222,62 @@
         .panel:nth-of-type(1) { border-top-color: #0f766e; }
         .panel:nth-of-type(2) { border-top-color: #0f766e; }
         .panel:nth-of-type(3) { border-top-color: #475569; }
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal.open { display: flex; }
+        .modal-card {
+            width: min(640px, 100%);
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 20px 44px rgba(15, 23, 42, 0.2);
+            padding: 14px;
+        }
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .modal-head h3 {
+            margin: 0;
+            font-size: 16px;
+            color: var(--primary-dark);
+        }
+        .btn-close-modal {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--muted);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 8px 10px;
+            font-size: 13px;
+        }
+        .detail-grid .label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        .detail-loading {
+            color: var(--muted);
+            font-size: 13px;
+        }
         @media (max-width: 760px) {
             .welcome-card {
                 padding: 22px;
@@ -181,6 +287,9 @@
             }
             .welcome-text {
                 font-size: 13px;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -214,7 +323,22 @@
         </div>
 
         <div class="panel">
-            <h2>Maintenance 30 Hari Ke Depan (Termasuk Lewat Due)</h2>
+            <div class="panel-head">
+                <h2>Jadwal Maintenance Terdekat</h2>
+                <form method="GET" action="{{ route('dashboard') }}" class="filter-days-form">
+                    <label for="days">Tampilkan:</label>
+                    <input
+                        type="number"
+                        id="days"
+                        name="days"
+                        min="1"
+                        max="365"
+                        value="{{ $daysAhead }}"
+                    >
+                    <span>hari</span>
+                    <button type="submit">Terapkan</button>
+                </form>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -242,7 +366,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5">Tidak ada AC yang perlu maintenance dalam 30 hari ke depan.</td>
+                            <td colspan="5">Tidak ada AC yang perlu maintenance dalam {{ $daysAhead }} hari ke depan.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -257,6 +381,7 @@
                         <th>Tanggal</th>
                         <th>Aset</th>
                         <th>Keterangan</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -265,10 +390,19 @@
                             <td>{{ $row['tanggal'] }}</td>
                             <td>{{ $row['aset'] }}</td>
                             <td>{{ $row['keterangan'] }}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn-detail"
+                                    data-perbaikan-id="{{ $row['id_perbaikan'] }}"
+                                >
+                                    Detail
+                                </button>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3">Belum ada riwayat perbaikan.</td>
+                            <td colspan="4">Belum ada riwayat perbaikan dalam 7 hari terakhir.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -276,8 +410,103 @@
         </div>
 
     </div>
+
+    <div id="repairDetailModal" class="modal" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3>Detail Perbaikan</h3>
+                <button type="button" class="btn-close-modal" id="closeRepairDetailModal">Tutup</button>
+            </div>
+            <div id="repairDetailBody" class="detail-loading">Memuat detail...</div>
+        </div>
+    </div>
+
+    <script>
+        (function initRepairDetailModal() {
+            const modal = document.getElementById('repairDetailModal');
+            const body = document.getElementById('repairDetailBody');
+            const closeBtn = document.getElementById('closeRepairDetailModal');
+            const detailButtons = document.querySelectorAll('[data-perbaikan-id]');
+
+            if (!modal || !body || !closeBtn || !detailButtons.length) return;
+
+            function openModal() {
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeModal() {
+                modal.classList.remove('open');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+
+            function toRupiah(value) {
+                if (value === null || value === undefined || value === '') return '-';
+                return new Intl.NumberFormat('id-ID').format(Number(value));
+            }
+
+            function escapeHtml(value) {
+                if (value === null || value === undefined) return '-';
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            async function loadDetail(id) {
+                body.className = 'detail-loading';
+                body.textContent = 'Memuat detail...';
+                openModal();
+
+                try {
+                    const response = await fetch(`/perbaikan/${id}`, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Gagal memuat data');
+                    }
+
+                    const data = await response.json();
+                    const aset = `${data.barang?.kode_bmn ?? '-'} / ${data.barang?.lokasi ?? '-'}`;
+
+                    body.className = 'detail-grid';
+                    body.innerHTML = `
+                        <div class="label">Tanggal</div><div>${escapeHtml(data.tanggal_perbaikan ?? '-')}</div>
+                        <div class="label">Aset</div><div>${escapeHtml(aset)}</div>
+                        <div class="label">Jenis Perbaikan</div><div>${escapeHtml(data.jenis_perbaikan ?? '-')}</div>
+                        <div class="label">Teknisi</div><div>${escapeHtml(data.user?.nama ?? '-')}</div>
+                        <div class="label">Vendor</div><div>${escapeHtml(data.vendor?.nama_vendor ?? '-')}</div>
+                        <div class="label">Status</div><div>${escapeHtml(data.status ?? '-')}</div>
+                        <div class="label">Biaya</div><div>${escapeHtml(data.biaya !== null ? 'Rp ' + toRupiah(data.biaya) : '-')}</div>
+                        <div class="label">Deskripsi</div><div>${escapeHtml(data.deskripsi ?? '-')}</div>
+                    `;
+                } catch (error) {
+                    body.className = 'detail-loading';
+                    body.textContent = 'Detail perbaikan gagal dimuat.';
+                }
+            }
+
+            detailButtons.forEach((button) => {
+                button.addEventListener('click', function () {
+                    const id = this.getAttribute('data-perbaikan-id');
+                    if (!id) return;
+                    loadDetail(id);
+                });
+            });
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && modal.classList.contains('open')) {
+                    closeModal();
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
-
-
-

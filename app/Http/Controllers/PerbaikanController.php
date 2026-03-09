@@ -139,7 +139,7 @@ class PerbaikanController extends Controller
     public function show(Perbaikan $perbaikan)
     {
         // Menampilkan detail perbaikan dengan relasi
-        return $perbaikan->load(['barang', 'user']);
+        return $perbaikan->load(['barang', 'user', 'vendor']);
     }
 
     /**

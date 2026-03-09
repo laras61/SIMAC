@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vendor;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class VendorController extends Controller
@@ -14,16 +13,13 @@ class VendorController extends Controller
         $status = trim((string) request('status', ''));
 
         $itemsQuery = Vendor::query()
-            ->with('user')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('nama_vendor', 'like', '%' . $search . '%')
                         ->orWhere('email', 'like', '%' . $search . '%')
                         ->orWhere('no_hp', 'like', '%' . $search . '%')
-                        ->orWhere('layanan', 'like', '%' . $search . '%')
-                        ->orWhereHas('user', function ($userQuery) use ($search) {
-                            $userQuery->where('nama', 'like', '%' . $search . '%');
-                        });
+                        ->orWhere('pic_nama', 'like', '%' . $search . '%')
+                        ->orWhere('pic_no_hp', 'like', '%' . $search . '%');
                 });
             })
             ->when($status !== '', function ($query) use ($status) {
@@ -34,14 +30,12 @@ class VendorController extends Controller
             ->latest('id_vendor')
             ->get();
 
-        $listUsers = User::select('id_user', 'nama')->orderBy('nama')->get();
-
         $editItem = null;
         if (request()->filled('edit')) {
             $editItem = Vendor::find(request('edit'));
         }
 
-        return view('vendor.index', compact('items', 'listUsers', 'editItem', 'search', 'status'));
+        return view('vendor.index', compact('items', 'editItem', 'search', 'status'));
     }
 
     public function insert(Request $request)
@@ -51,8 +45,8 @@ class VendorController extends Controller
             'email' => 'nullable|string|email|max:255|unique:tbl_vendor,email',
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
-            'id_user' => 'nullable|exists:users,id_user',
-            'layanan' => 'required|in:maintenance,perbaikan',
+            'pic_nama' => 'nullable|string|max:255',
+            'pic_no_hp' => 'nullable|string|max:20',
             'status' => 'required|in:aktif,nonaktif',
             'catatan' => 'nullable|string',
         ]);
@@ -74,8 +68,8 @@ class VendorController extends Controller
             'email' => 'nullable|string|email|max:255|unique:tbl_vendor,email,' . $vendor->id_vendor . ',id_vendor',
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
-            'id_user' => 'nullable|exists:users,id_user',
-            'layanan' => 'required|in:maintenance,perbaikan',
+            'pic_nama' => 'nullable|string|max:255',
+            'pic_no_hp' => 'nullable|string|max:20',
             'status' => 'required|in:aktif,nonaktif',
             'catatan' => 'nullable|string',
         ]);
