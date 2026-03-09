@@ -57,8 +57,6 @@ class MaintenanceController extends Controller
             ->orderByDesc('id_maintenance')
             ->get();
         $listVendors = Vendor::query()
-            ->where('layanan', 'maintenance')
-            ->where('status', 'aktif')
             ->select('id_vendor', 'nama_vendor')
             ->orderBy('nama_vendor')
             ->get();
@@ -89,9 +87,6 @@ class MaintenanceController extends Controller
             ->orderBy('kode_bmn')
             ->get();
         $listVendors = Vendor::query()
-            ->where('id_user', $userId)
-            ->where('layanan', 'maintenance')
-            ->where('status', 'aktif')
             ->select('id_vendor', 'nama_vendor')
             ->orderBy('nama_vendor')
             ->get();
@@ -113,14 +108,7 @@ class MaintenanceController extends Controller
 
         $validated = $request->validate([
             'id_ac' => 'required|exists:tbl_barang,id_ac',
-            'id_vendor' => [
-                'nullable',
-                Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
-                    $q->where('id_user', $user->id_user)
-                      ->where('layanan', 'maintenance')
-                      ->where('status', 'aktif');
-                }),
-            ],
+            'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
             'tanggal_jadwal' => 'required|date',
             'tanggal_dikerjakan' => 'nullable|date',
             'jenis' => ['required', Rule::in(['preventive', 'corrective'])],
@@ -177,14 +165,7 @@ class MaintenanceController extends Controller
 
             $validated = $request->validate([
                 'status' => ['required', Rule::in(['pending', 'proses', 'selesai'])],
-                'id_vendor' => [
-                    'nullable',
-                    Rule::exists('tbl_vendor', 'id_vendor')->where(function ($q) use ($user) {
-                        $q->where('id_user', $user->id_user)
-                          ->where('layanan', 'maintenance')
-                          ->where('status', 'aktif');
-                    }),
-                ],
+                'id_vendor' => 'nullable|exists:tbl_vendor,id_vendor',
                 'catatan' => 'required|string',
                 'tanggal_dikerjakan' => 'nullable|date',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
