@@ -21,6 +21,7 @@ class Perbaikan extends Model
         'id_vendor',
         'biaya',
         'status',
+        'foto',
     ];
 
     // Relasi ke Barang
@@ -38,5 +39,36 @@ class Perbaikan extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'id_vendor', 'id_vendor');
+    }
+
+    // Method untuk upload foto
+    public function uploadFoto($file, $path = 'perbaikan')
+    {
+        if ($file) {
+            // Hapus foto lama jika ada
+            if ($this->foto && file_exists(storage_path('app/public/' . $this->foto))) {
+                unlink(storage_path('app/public/' . $this->foto));
+            }
+            
+            // Simpan foto baru
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('public/' . $path, $filename);
+            
+            // Update path di database
+            $this->update(['foto' => str_replace('public/', '', $filePath)]);
+            
+            return str_replace('public/', '', $filePath);
+        }
+        
+        return null;
+    }
+
+    // Method untuk hapus foto
+    public function deleteFoto()
+    {
+        if ($this->foto && file_exists(storage_path('app/public/' . $this->foto))) {
+            unlink(storage_path('app/public/' . $this->foto));
+            $this->update(['foto' => null]);
+        }
     }
 }
