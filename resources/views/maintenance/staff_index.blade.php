@@ -225,6 +225,7 @@
                                             data-vendor-pic="{{ $item->vendor->pic_nama ?? '' }}"
                                             data-vendor-no-hp="{{ $item->vendor->no_hp ?? '' }}"
                                             data-vendor-email="{{ $item->vendor->email ?? '' }}"
+                                            data-foto="{{ $item->foto ? url('/files/' . $item->foto) : '' }}"
                                             class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                                             title="Lihat detail maintenance"
                                             aria-label="Lihat detail maintenance"
@@ -319,6 +320,11 @@
                         <div class="sm:col-span-2">
                             <p class="text-gray-500">Catatan</p>
                             <p id="detailCatatan" class="font-medium text-gray-900 whitespace-pre-line">-</p>
+                        </div>
+                        <div class="sm:col-span-2" id="detailFotoContainer">
+                            <p class="text-gray-500 mb-2">Foto Dokumentasi</p>
+                            <img id="detailFoto" src="" alt="Foto Maintenance" class="w-full max-h-64 object-contain rounded-lg border border-gray-200">
+                            <p id="detailNoFoto" class="text-gray-400 italic hidden">Tidak ada foto.</p>
                         </div>
                     </div>
                 </div>
@@ -472,6 +478,19 @@
             document.getElementById('detailVendorNoHp').textContent = data.vendorNoHp || '-';
             document.getElementById('detailVendorEmail').textContent = data.vendorEmail || '-';
             document.getElementById('detailCatatan').textContent = data.catatan || '-';
+
+            const fotoImg = document.getElementById('detailFoto');
+            const noFoto = document.getElementById('detailNoFoto');
+            
+            if (data.foto) {
+                fotoImg.src = data.foto;
+                fotoImg.classList.remove('hidden');
+                noFoto.classList.add('hidden');
+            } else {
+                fotoImg.src = '';
+                fotoImg.classList.add('hidden');
+                noFoto.classList.remove('hidden');
+            }
 
             document.getElementById('detailModal').classList.remove('hidden');
         }

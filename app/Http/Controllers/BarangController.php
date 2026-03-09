@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class BarangController extends Controller
 {
@@ -38,8 +39,11 @@ class BarangController extends Controller
             $editItem = Barang::find(request('edit'));
         }
 
-        if (auth()->check() && in_array(auth()->user()->role, ['staff', 'pic'])) {
-            return view('barang.staff_index', compact('items', 'search', 'status'));
+        if (auth()->check()) {
+            $role = strtolower(trim(auth()->user()->role));
+            if (in_array($role, ['staff', 'pic'])) {
+                return view('barang.staff_index', compact('items', 'search', 'status'));
+            }
         }
 
         return view('barang.index', compact('items', 'editItem', 'search', 'status'));

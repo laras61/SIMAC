@@ -37,11 +37,14 @@ Route::get('/teknisi-dashboard', [DashboardController::class, 'teknisi'])
 Route::get('/staff-dashboard', [DashboardController::class, 'staff'])
     ->middleware('auth')
     ->name('staff.dashboard');
-Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
-Route::post('/barang/insert', [BarangController::class, 'insert'])->name('barang.insert');
-Route::get('/barang/{barang}', [BarangController::class, 'show'])->name('barang.show');
-Route::match(['put', 'patch'], '/barang/update/{barang}', [BarangController::class, 'update'])->name('barang.update');
-Route::delete('/barang/delete/{barang}', [BarangController::class, 'destroy'])->name('barang.destroy');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+    Route::post('/barang/insert', [BarangController::class, 'insert'])->name('barang.insert');
+    Route::get('/barang/{barang}', [BarangController::class, 'show'])->name('barang.show');
+    Route::match(['put', 'patch'], '/barang/update/{barang}', [BarangController::class, 'update'])->name('barang.update');
+    Route::delete('/barang/delete/{barang}', [BarangController::class, 'destroy'])->name('barang.destroy');
+});
 
 Route::get('/user', [UserController::class, 'index'])->name('user.index');
 Route::post('/user/insert', [UserController::class, 'insert'])->name('user.insert');
