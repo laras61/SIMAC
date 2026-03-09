@@ -102,7 +102,7 @@
                                 </select>
                             </div>
                             <div class="field">
-                                <label for="id_user">Teknisi</label>
+                                <label for="id_user">Staff</label>
                                 <select id="id_user" name="id_user" required>
                                     @foreach ($listTeknisi as $teknisi)
                                         <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user', $editItem->id_user) === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
@@ -161,7 +161,7 @@
                 <form method="GET" action="{{ route('perbaikan.index') }}" class="filter-form" id="perbaikanFilterForm">
                     <div class="field">
                         <label for="q">Pencarian</label>
-                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Aset, teknisi, jenis, deskripsi">
+                        <input id="q" type="text" name="q" value="{{ request('q') }}" placeholder="Aset, staff, jenis, deskripsi">
                     </div>
                     <div class="field">
                         <label for="status_filter">Filter Status</label>
@@ -179,9 +179,10 @@
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Barang</th>
-                            <th>Jenis</th>
-                            <th>Teknisi</th>
+                            <th>Perbaikan</th>
+                            <th>Staff</th>
                             <th>Vendor</th>
+                            <th>PIC Vendor</th>
                             <th>Biaya</th>
                             <th>Status</th>
                             <th>Deskripsi</th>
@@ -197,6 +198,7 @@
                                 <td>{{ $row->jenis_perbaikan }}</td>
                                 <td>{{ optional($row->user)->nama ?? '-' }}</td>
                                 <td>{{ optional($row->vendor)->nama_vendor ?? '-' }}</td>
+                                <td>{{ optional($row->vendor)->pic_nama ?? '-' }}</td>
                                 <td>{{ $row->biaya !== null ? number_format((float) $row->biaya, 0, ',', '.') : '-' }}</td>
                                 <td>{{ $row->status ?? '-' }}</td>
                                 <td>{{ $row->deskripsi ?: '-' }}</td>
@@ -212,7 +214,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="10">Belum ada data.</td></tr>
+                            <tr><td colspan="11">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -239,9 +241,9 @@
                         </select>
                     </div>
                     <div class="field">
-                        <label for="add_id_user">Teknisi</label>
+                        <label for="add_id_user">Staff</label>
                         <select id="add_id_user" name="id_user" required>
-                            <option value="">Pilih teknisi</option>
+                            <option value="">Pilih staff</option>
                             @foreach ($listTeknisi as $teknisi)
                                 <option value="{{ $teknisi->id_user }}" {{ (string) old('id_user') === (string) $teknisi->id_user ? 'selected' : '' }}>{{ $teknisi->nama }}</option>
                             @endforeach
